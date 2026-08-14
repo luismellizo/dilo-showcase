@@ -9,8 +9,10 @@ costo del LLM: así el precio del plan queda anclado al gasto que genera.
 Idempotente: usa `update_or_create`, se puede re-ejecutar sin duplicar.
 
 ⚠️  PRECIOS Y CUPOS REALES OMITIDOS — información comercial.
-    Los valores de abajo son placeholders. La estructura de planes, el modelo
-    de cobro y el enforcement (ver `orders/billing.py`) sí son los reales.
+    Los valores de abajo son placeholders redondos, elegidos solo para que la
+    suite de tests tenga cupos coherentes con los que verificar el enforcement.
+    La estructura de planes, el modelo de cobro y la lógica de enforcement
+    (ver `orders/billing.py`) sí son los reales.
 """
 from django.db import migrations
 
@@ -18,8 +20,8 @@ PLANS = [
     {
         'code': 'FREE',
         'name': 'Gratis',
-        'price_cop': 0,          # placeholder
-        'conversation_limit': 0,  # placeholder
+        'price_cop': 0,             # placeholder
+        'conversation_limit': 100,  # placeholder
         'display_order': 0,
         'features': [
             'Bot de ventas con IA (WhatsApp y Telegram)',
@@ -30,8 +32,8 @@ PLANS = [
     {
         'code': 'PRO',
         'name': 'Pro',
-        'price_cop': 0,          # placeholder
-        'conversation_limit': 0,  # placeholder
+        'price_cop': 0,               # placeholder
+        'conversation_limit': 1000,   # placeholder
         'display_order': 1,
         'features': [
             'Todo lo del plan Gratis',
@@ -43,8 +45,8 @@ PLANS = [
     {
         'code': 'PREMIUM',
         'name': 'Premium',
-        'price_cop': 0,          # placeholder
-        'conversation_limit': 0,  # placeholder
+        'price_cop': 0,                # placeholder
+        'conversation_limit': 10000,   # placeholder
         'display_order': 2,
         'features': [
             'Todo lo del plan Pro',
