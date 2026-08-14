@@ -1,0 +1,337 @@
+/* ============================================================================
+   DILO · Design tokens — Material 3
+   ----------------------------------------------------------------------------
+   FUENTE ÚNICA DE VERDAD VISUAL DEL PANEL. Ningún componente debe escribir un
+   hex: todo valor de color, forma, espacio, tipografía, elevación o movimiento
+   sale de aquí.
+
+   Cómo está organizado
+   --------------------
+   1. Constantes que no dependen del tema: forma, espacio, tipografía, motion.
+   2. Rampa tonal derivada de `--accent` (el color que elige cada comercio en
+      Config → Tienda). Se calcula con `color-mix`, así que DILO tiene un tema
+      Material correcto con CUALQUIER acento, no solo con el naranja de marca.
+   3. Roles de color por preset (`[data-theme="dark|light|midnight"]`).
+
+   Por qué rampa tonal y no el hex del acento a pelo
+   -------------------------------------------------
+   El acento por defecto (#FF441F) sobre blanco da 3.6:1 — reprueba AA para
+   texto normal. Material resuelve esto igual que Google: en tema oscuro el rol
+   `primary` es un tono CLARO del color de marca (T80) y el texto que va encima
+   es un tono OSCURO (T20); en tema claro, al revés. Así el contraste sale bien
+   solo, sea cual sea el acento que escriba el dueño de la tienda.
+   `--brand` conserva el acento crudo para logo y adornos (nunca para texto).
+   ========================================================================== */
+
+:root {
+  /* ---------------------------------------------------------------- forma --
+     Escala de forma M3. Se asigna por CATEGORÍA de componente, no al gusto:
+       xs  → indicadores, barritas
+       sm  → chips pequeños, badges cuadrados
+       md  → campos de texto, celdas, menús
+       lg  → tarjetas, contenedores
+       xl  → diálogos, hojas, superficies grandes
+       full→ botones, chips, píldoras de navegación, avatares            */
+  --shape-xs: 4px;
+  --shape-sm: 8px;
+  --shape-md: 12px;
+  --shape-lg: 16px;
+  --shape-xl: 28px;
+  --shape-full: 9999px;
+
+  /* -------------------------------------------------------------- espacio --
+     Base 8. Los medios pasos (4px) existen solo para separación óptica
+     dentro de una misma línea (icono ↔ texto).                          */
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 40px;
+  --space-8: 48px;
+  --space-9: 64px;
+  --space-10: 80px;
+
+  /* --------------------------------------------------------------- layout --
+     El contenido nunca toca los bordes de la pantalla: se centra a un ancho
+     legible con aire a los lados, como en las apps de Google.            */
+  --content-max: 960px;   /* páginas de lectura/formulario */
+  --content-wide: 1440px; /* tableros (Kanban, KDS) que sí quieren ancho */
+  --nav-width: 264px;     /* riel de navegación en escritorio */
+  --topbar-height: 64px;
+
+  /* ----------------------------------------------------------- tipografía --
+     Una sola familia en todo el panel. Roboto Flex es la fuente de Material 3
+     (Google Sans no tiene licencia para terceros). Variable: un archivo cubre
+     todos los pesos.                                                     */
+  --font-sans: 'Roboto Flex', Roboto, 'Helvetica Neue', system-ui, -apple-system, sans-serif;
+
+  /* Escala corta. El peso por defecto es 400 en TODO: la jerarquía la dan el
+     tamaño y el color, no el grosor. 500 solo en botones y elementos
+     seleccionados. Nada de 700/800/900 en el panel.                      */
+  --type-display-size: 44px;   --type-display-line: 52px;   --type-display-weight: 400;
+  --type-headline-size: 28px;  --type-headline-line: 36px;  --type-headline-weight: 400;
+  --type-title-lg-size: 22px;  --type-title-lg-line: 28px;  --type-title-lg-weight: 400;
+  --type-title-size: 16px;     --type-title-line: 24px;     --type-title-weight: 500;
+  --type-body-lg-size: 16px;   --type-body-lg-line: 24px;   --type-body-lg-weight: 400;
+  --type-body-size: 14px;      --type-body-line: 20px;      --type-body-weight: 400;
+  --type-body-sm-size: 12px;   --type-body-sm-line: 16px;   --type-body-sm-weight: 400;
+  --type-label-lg-size: 14px;  --type-label-lg-line: 20px;  --type-label-lg-weight: 500;
+  --type-label-size: 12px;     --type-label-line: 16px;     --type-label-weight: 500;
+
+  --tracking-tight: 0;      /* M3 no aprieta el tracking; el default es 0 */
+  --tracking-label: 0.1px;
+
+  /* ------------------------------------------------------------ movimiento --
+     Duraciones y curvas de M3. Regla: 150-250ms, salida suave.
+     El hover cambia la SUPERFICIE (state layer), nunca la escala.        */
+  --motion-short: 150ms;
+  --motion-medium: 250ms;
+  --motion-long: 400ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0, 1);
+  --ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+
+  /* --------------------------------------------------- capas de estado M3 --
+     Opacidad del velo del color de contenido que se pinta encima de la
+     superficie al interactuar. Sustituye a los `hover:bg-gray-100` fijos.  */
+  --state-hover: 0.08;
+  --state-focus: 0.10;
+  --state-press: 0.10;
+  --state-drag: 0.16;
+  --state-disabled-content: 0.38;
+  --state-disabled-surface: 0.12;
+
+  /* ------------------------------------------------------- acento y rampa --
+     `--accent` lo escribe ThemeContext desde el color de la tienda.       */
+  --accent: #FF441F;
+  --brand: var(--accent);
+
+  /* Rampa tonal derivada. Los porcentajes aproximan las paletas HCT de M3
+     con `color-mix` en sRGB (sin JS, sin dependencias, recalculada por el
+     navegador en cuanto cambia `--accent`).                              */
+  --accent-t95: color-mix(in srgb, var(--accent) 12%, #ffffff);
+  --accent-t90: color-mix(in srgb, var(--accent) 24%, #ffffff);
+  --accent-t80: color-mix(in srgb, var(--accent) 48%, #ffffff);
+  --accent-t70: color-mix(in srgb, var(--accent) 70%, #ffffff);
+  --accent-t60: color-mix(in srgb, var(--accent) 88%, #ffffff);
+  --accent-t50: var(--accent);
+  --accent-t40: color-mix(in srgb, var(--accent) 80%, #000000);
+  --accent-t30: color-mix(in srgb, var(--accent) 58%, #000000);
+  --accent-t20: color-mix(in srgb, var(--accent) 38%, #000000);
+  --accent-t10: color-mix(in srgb, var(--accent) 22%, #000000);
+
+  /* Compatibilidad: `--accent-soft` la usan componentes antiguos. */
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+
+  /* ------------------------------------------------------------- marca --
+     Colores del isotipo de DILO. NO son roles de interfaz y NO siguen el
+     acento del comercio: si una tienda pone su acento en verde, el logo de
+     DILO sigue siendo naranja. Van en :root (no dentro de [data-theme])
+     porque el landing también los usa y no lleva preset de tema.       */
+  --logo-orange: #FF441F;
+  --logo-dots: #ffffff;
+}
+
+/* ============================================================================
+   TEMA OSCURO — "Carbón". Neutrales de Material 3 dark, los mismos grises que
+   usan las apps de Google. La elevación se expresa con el TONO de la
+   superficie, no con sombra: sobre fondo casi negro una sombra negra no se ve.
+   ========================================================================== */
+[data-theme='dark'] {
+  --surface: #131314;
+  --surface-dim: #0e0e0f;
+  --surface-bright: #37393b;
+  --surface-container-lowest: #0e0e0f;
+  --surface-container-low: #1b1b1c;
+  --surface-container: #1e1f20;
+  --surface-container-high: #282a2c;
+  --surface-container-highest: #333537;
+
+  --on-surface: #e3e3e3;
+  --on-surface-variant: #c4c7c5;
+  --on-surface-muted: #9aa0a6;   /* 6.0:1 sobre --surface-container-low ✅ AA */
+
+  --outline: #8e918f;
+  --outline-variant: #444746;
+
+  --primary: var(--accent-t80);
+  --on-primary: var(--accent-t20);
+  --primary-container: var(--accent-t30);
+  --on-primary-container: var(--accent-t90);
+
+  /* Contenedor de la píldora de navegación seleccionada. */
+  --secondary-container: color-mix(in srgb, var(--accent) 26%, #1e1f20);
+  --on-secondary-container: var(--accent-t90);
+
+  --error: #f2b8b5;
+  --on-error: #601410;
+  --error-container: #8c1d18;
+  --on-error-container: #f9dedc;
+
+  --success: #6dd58c;
+  --on-success: #003917;
+  --success-container: #005322;
+  --on-success-container: #97f0ab;
+
+  --warning: #f5c26b;
+  --on-warning: #3f2d00;
+  --warning-container: #5b4200;
+  --on-warning-container: #ffdea8;
+
+  --info: #a8c7fa;
+  --on-info: #062e6f;
+  --info-container: #0842a0;
+  --on-info-container: #d3e3fd;
+
+  --inverse-surface: #e3e3e3;
+  --inverse-on-surface: #303030;
+  --inverse-primary: var(--accent-t40);
+
+  --scrim: 0, 0, 0;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-2: 0 2px 6px rgba(0, 0, 0, 0.5);
+  --shadow-3: 0 4px 12px rgba(0, 0, 0, 0.55);
+
+  /* Fondo del shell: plano, sin degradado. Google no pone auroras detrás de
+     un panel de trabajo. */
+  --app-bg: var(--surface);
+  /* Textura de fondo del panel (motivo por rubro, ver FoodBackdrop). Muy baja
+     a propósito: es textura, no decoración. */
+  --backdrop-ink: #ffffff;
+  --backdrop-opacity: 0.02;
+
+  color-scheme: dark;
+}
+
+/* ============================================================================
+   TEMA CLARO — Material 3 light con los neutrales de Google (el gris azulado
+   #f0f4f9 del fondo de las apps, tarjetas blancas).
+   ========================================================================== */
+[data-theme='light'] {
+  --surface: #f8fafd;
+  --surface-dim: #d9dade;
+  --surface-bright: #ffffff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #ffffff;
+  --surface-container: #f0f4f9;
+  --surface-container-high: #e9eef6;
+  --surface-container-highest: #dde3ea;
+
+  --on-surface: #1f1f1f;
+  --on-surface-variant: #444746;
+  --on-surface-muted: #5f6368;   /* 6.4:1 sobre blanco ✅ AA */
+
+  --outline: #747775;
+  --outline-variant: #c4c7c5;
+
+  --primary: var(--accent-t40);
+  --on-primary: #ffffff;
+  --primary-container: var(--accent-t90);
+  --on-primary-container: var(--accent-t10);
+
+  --secondary-container: color-mix(in srgb, var(--accent) 16%, #ffffff);
+  --on-secondary-container: var(--accent-t20);
+
+  --error: #b3261e;
+  --on-error: #ffffff;
+  --error-container: #f9dedc;
+  --on-error-container: #410e0b;
+
+  --success: #146c2e;
+  --on-success: #ffffff;
+  --success-container: #c4eed0;
+  --on-success-container: #072711;
+
+  --warning: #8f5c00;
+  --on-warning: #ffffff;
+  --warning-container: #ffdea8;
+  --on-warning-container: #2a1c00;
+
+  --info: #0842a0;
+  --on-info: #ffffff;
+  --info-container: #d3e3fd;
+  --on-info-container: #041e49;
+
+  --inverse-surface: #303030;
+  --inverse-on-surface: #f2f2f2;
+  --inverse-primary: var(--accent-t80);
+
+  --scrim: 0, 0, 0;
+  --shadow-1: 0 1px 2px rgba(60, 64, 67, 0.15);
+  --shadow-2: 0 1px 3px rgba(60, 64, 67, 0.16), 0 4px 8px rgba(60, 64, 67, 0.10);
+  --shadow-3: 0 2px 6px rgba(60, 64, 67, 0.16), 0 8px 24px rgba(60, 64, 67, 0.12);
+
+  --app-bg: var(--surface);
+  --backdrop-ink: #0f172a;
+  --backdrop-opacity: 0.03;
+
+  color-scheme: light;
+}
+
+/* ============================================================================
+   TEMA MEDIANOCHE — misma estructura M3, neutrales desplazados a azul.
+   ========================================================================== */
+[data-theme='midnight'] {
+  --surface: #0d1220;
+  --surface-dim: #080b14;
+  --surface-bright: #2c3550;
+  --surface-container-lowest: #080b14;
+  --surface-container-low: #131a2c;
+  --surface-container: #171f34;
+  --surface-container-high: #1f293f;
+  --surface-container-highest: #29344c;
+
+  --on-surface: #e2e6f0;
+  --on-surface-variant: #c0c7d8;
+  --on-surface-muted: #98a1b8;   /* 5.6:1 sobre --surface-container-low ✅ AA */
+
+  --outline: #8891a8;
+  --outline-variant: #3a4560;
+
+  --primary: var(--accent-t80);
+  --on-primary: var(--accent-t20);
+  --primary-container: var(--accent-t30);
+  --on-primary-container: var(--accent-t90);
+
+  --secondary-container: color-mix(in srgb, var(--accent) 24%, #171f34);
+  --on-secondary-container: var(--accent-t90);
+
+  --error: #f2b8b5;
+  --on-error: #601410;
+  --error-container: #8c1d18;
+  --on-error-container: #f9dedc;
+
+  --success: #6dd58c;
+  --on-success: #003917;
+  --success-container: #00461d;
+  --on-success-container: #97f0ab;
+
+  --warning: #f5c26b;
+  --on-warning: #3f2d00;
+  --warning-container: #513a00;
+  --on-warning-container: #ffdea8;
+
+  --info: #a8c7fa;
+  --on-info: #062e6f;
+  --info-container: #0842a0;
+  --on-info-container: #d3e3fd;
+
+  --inverse-surface: #e2e6f0;
+  --inverse-on-surface: #23293a;
+  --inverse-primary: var(--accent-t40);
+
+  --scrim: 0, 0, 0;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.55);
+  --shadow-2: 0 2px 6px rgba(0, 0, 0, 0.55);
+  --shadow-3: 0 4px 12px rgba(0, 0, 0, 0.6);
+
+  --app-bg: var(--surface);
+  --backdrop-ink: #ffffff;
+  --backdrop-opacity: 0.02;
+
+  color-scheme: dark;
+}

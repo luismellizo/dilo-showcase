@@ -1,0 +1,148 @@
+{% comment %}
+================================================================================
+DILO — PLANTILLA MAESTRA DE CORREO TRANSACCIONAL
+================================================================================
+Una sola estructura visual para TODOS los correos de la plataforma. Un correo
+nuevo hereda de aquí y solo rellena bloques; jamás redefine el marco.
+
+Bloques disponibles:
+  preheader     texto de vista previa en la bandeja (obligatorio, 40-90 chars)
+  hero_eyebrow  etiqueta corta sobre el título (opcional)
+  hero_title    título grande (obligatorio)
+  hero_subtitle una línea de contexto (opcional)
+  content       cuerpo: módulos de emails/modules/*.html
+  footer_extra  línea adicional en el pie (opcional)
+
+Reglas de compatibilidad (no negociables — se rompen en clientes reales):
+  · Tablas para la estructura. Nada de flex/grid/float.
+  · CSS inline en cada celda. El <style> del <head> es solo para media queries
+    y dark mode: Gmail lo respeta, Outlook lo ignora, y el diseño debe
+    sostenerse sin él.
+  · Sin JavaScript, sin SVG, sin webfonts, sin imágenes remotas: el logo se
+    construye con tablas y texto, así se ve siempre (las imágenes vienen
+    bloqueadas por defecto en la mayoría de clientes).
+  · Ancho 560px, colapsa a 100% en móvil. Mobile-first en las media queries.
+================================================================================
+{% endcomment %}<!DOCTYPE html>
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+{% comment %}Le pide al cliente que NO invierta los colores por su cuenta.{% endcomment %}
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>{% block title %}DILO{% endblock %}</title>
+<!--[if mso]>
+<noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+<![endif]-->
+<style>
+  /* Reset defensivo: cada cliente trae su propio equipaje. */
+  body { margin:0 !important; padding:0 !important; width:100% !important; }
+  table { border-collapse:collapse !important; mso-table-lspace:0pt; mso-table-rspace:0pt; }
+  img { border:0; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; }
+  a { text-decoration:none; }
+  /* iOS convierte fechas/direcciones en links azules; los neutralizamos. */
+  a[x-apple-data-detectors] { color:inherit !important; text-decoration:none !important; font-size:inherit !important; font-weight:inherit !important; }
+  /* Outlook.com fuerza su propia tipografía si no se le gana en especificidad. */
+  .ExternalClass { width:100%; }
+  .ExternalClass, .ExternalClass p, .ExternalClass td, .ExternalClass div { line-height:inherit; }
+
+  @media only screen and (max-width:600px) {
+    .dl-container { width:100% !important; }
+    .dl-pad { padding-left:24px !important; padding-right:24px !important; }
+    .dl-title { font-size:26px !important; line-height:32px !important; }
+    .dl-otp { font-size:34px !important; letter-spacing:8px !important; }
+    .dl-btn a { display:block !important; width:auto !important; }
+    /* Las filas etiqueta/valor se apilan: a 320px no caben en una línea. */
+    .dl-stack { display:block !important; width:100% !important; text-align:left !important; }
+    .dl-stack-label { padding:14px 20px 0 20px !important; border-top:0 !important; }
+    .dl-stack-value { padding:2px 20px 12px 20px !important; border-top:0 !important; }
+    .dl-hide-sm { display:none !important; }
+  }
+
+  /* Dark mode: no se pelea con el cliente, se acompaña. El blanco puro pasa a
+     un grafito cálido y el naranja de marca se mantiene intacto. */
+  @media (prefers-color-scheme: dark) {
+    .dl-bg { background-color:#0d0d0f !important; }
+    .dl-card { background-color:#161618 !important; border-color:#26262a !important; }
+    .dl-surface { background-color:#1d1d20 !important; border-color:#2b2b30 !important; }
+    .dl-ink, .dl-title { color:#f5f5f4 !important; }
+    .dl-muted { color:#a1a1a6 !important; }
+    .dl-hairline { border-color:#2b2b30 !important; }
+    .dl-wordmark { color:#f5f5f4 !important; }
+  }
+</style>
+</head>
+<body class="dl-bg" style="margin:0; padding:0; background-color:#f4f4f2; -webkit-font-smoothing:antialiased;">
+
+{% comment %}Preheader: lo que se lee en la bandeja junto al asunto. Sin esto,
+el cliente rellena con el primer texto que encuentre (basura).{% endcomment %}
+<div style="display:none; font-size:1px; color:#f4f4f2; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
+  {% block preheader %}{% endblock %}
+  &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847;
+</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="dl-bg" style="background-color:#f4f4f2;">
+  <tr>
+    <td align="center" style="padding:32px 12px 48px 12px;">
+
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" class="dl-container" style="width:560px; max-width:560px;">
+
+        <!-- ══ HEADER ══════════════════════════════════════════════════ -->
+        <tr>
+          <td class="dl-pad" style="padding:0 8px 20px 8px;">
+            {% include "emails/modules/header.html" %}
+          </td>
+        </tr>
+
+        <!-- ══ TARJETA PRINCIPAL ═══════════════════════════════════════ -->
+        <tr>
+          <td>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="dl-card"
+                   style="background-color:#ffffff; border:1px solid #ececea; border-radius:20px;">
+
+              {% comment %}Filete naranja superior: la firma de la marca, visible
+              incluso antes de leer una palabra.{% endcomment %}
+              <tr>
+                <td style="height:4px; line-height:4px; font-size:0; background-color:#FF441F; border-radius:20px 20px 0 0;">&nbsp;</td>
+              </tr>
+
+              <!-- ── HERO ── -->
+              <tr>
+                <td class="dl-pad" style="padding:40px 40px 0 40px;">
+                  {% block hero %}
+                    {% block hero_eyebrow %}{% endblock %}
+                    <h1 class="dl-title dl-ink" style="margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:30px; line-height:36px; font-weight:800; letter-spacing:-0.8px; color:#0f0f10;">
+                      {% block hero_title %}{% endblock %}
+                    </h1>
+                    {% block hero_subtitle %}{% endblock %}
+                  {% endblock %}
+                </td>
+              </tr>
+
+              <!-- ── CONTENIDO ── -->
+              <tr>
+                <td class="dl-pad" style="padding:28px 40px 40px 40px;">
+                  {% block content %}{% endblock %}
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+
+        <!-- ══ FOOTER ══════════════════════════════════════════════════ -->
+        <tr>
+          <td class="dl-pad" style="padding:28px 8px 0 8px;">
+            {% include "emails/modules/footer.html" %}
+          </td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+</table>
+</body>
+</html>

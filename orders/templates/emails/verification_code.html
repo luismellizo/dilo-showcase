@@ -1,0 +1,44 @@
+{% extends "emails/base.html" %}
+{% comment %}
+VARIANTE 1 — Código de verificación (OTP).
+
+El código es el único protagonista: nada compite con él. Sin CTA, porque la
+acción no ocurre en el correo sino de vuelta en la pantalla donde el usuario ya
+está esperando.
+
+Contexto esperado:
+  code, ttl_label, greeting_name (opc.), purpose (opc.), ip (opc.)
+{% endcomment %}
+
+{% block title %}{{ code }} · Tu código de DILO{% endblock %}
+{% block preheader %}{{ code }} — vence en {{ ttl_label }}. No lo compartas con nadie.{% endblock %}
+
+{% block hero_eyebrow %}
+<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+            font-size:11px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase; color:#FF441F; padding-bottom:12px;">
+  Verificación
+</div>
+{% endblock %}
+
+{% block hero_title %}Tu código de verificación{% endblock %}
+
+{% block hero_subtitle %}
+<p class="dl-muted" style="margin:12px 0 0 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+          font-size:15px; line-height:24px; color:#77777c;">
+  {% if greeting_name %}Hola {{ greeting_name }}, i{% else %}I{% endif %}ngresa este código para
+  {{ purpose|default:"continuar con el acceso a tu cuenta" }}.
+</p>
+{% endblock %}
+
+{% block content %}
+  {% include "emails/modules/otp.html" with code=code ttl_label=ttl_label otp_label="Código de acceso" %}
+
+  {% include "emails/modules/spacer.html" with h=24 %}
+
+  {% include "emails/modules/security_alert.html" with heading="Nadie de DILO te pedirá este código" text="Ni por WhatsApp, ni por teléfono, ni por correo. Si alguien te lo pide, es un intento de fraude." %}
+
+  {% if ip %}
+    {% include "emails/modules/spacer.html" with h=16 %}
+    {% include "emails/modules/text.html" with size="small" text="Solicitado desde la IP "|add:ip %}
+  {% endif %}
+{% endblock %}

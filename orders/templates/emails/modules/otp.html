@@ -1,0 +1,39 @@
+{% comment %}
+MÓDULO: OTP — el código como protagonista absoluto.
+
+Uso:  {% include "emails/modules/otp.html" with code=code ttl_label="3 minutos" %}
+
+Decisiones:
+· El código va en una superficie gris clara con borde, no en un bloque naranja:
+  el naranja se reserva para la ACCIÓN (el botón). Un código no es una acción.
+· `letter-spacing` amplio + tamaño grande para que se lea de un vistazo y se
+  copie sin error. Se mantiene como texto seleccionable (nunca imagen), que es
+  lo que permite copiar y pegar.
+· Sin `user-select:none` ni trucos: el usuario tiene que poder tocar y copiar.
+{% endcomment %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td align="center" class="dl-surface"
+        style="background-color:#f7f7f5; border:1px solid #eaeae7; border-radius:16px; padding:26px 16px 22px 16px;">
+
+      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                  font-size:11px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase; color:#9a9a9f;">
+        {{ otp_label|default:"Tu código" }}
+      </div>
+
+      <div class="dl-otp dl-ink" style="margin-top:12px; font-family:'SF Mono',SFMono-Regular,ui-monospace,Menlo,Consolas,'Courier New',monospace;
+                  font-size:40px; line-height:46px; font-weight:700; letter-spacing:11px; color:#0f0f10;
+                  text-indent:11px;">
+        {{ code }}
+      </div>
+
+      {% if ttl_label %}
+      <div class="dl-muted" style="margin-top:14px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                  font-size:13px; line-height:18px; color:#77777c;">
+        Vence en <strong style="color:#FF441F; font-weight:700;">{{ ttl_label }}</strong> y solo sirve una vez.
+      </div>
+      {% endif %}
+
+    </td>
+  </tr>
+</table>

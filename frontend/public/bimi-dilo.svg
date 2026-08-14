@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Logo de DILO en formato BIMI (SVG Tiny Portable/Secure).
+
+  Este archivo NO es decorativo: es el que las CA y los buzones descargan desde
+  https://dilo.example.com/bimi-dilo.svg cuando exista el registro _bimi. El perfil
+  Tiny PS es estricto y un archivo que no lo cumpla se ignora en silencio:
+    · version="1.2" + baseProfile="tiny-ps" y <title> son OBLIGATORIOS
+    · lienzo cuadrado (aquí 512x512)
+    · prohibido: <script>, animación, <image>, <foreignObject>, <a>,
+      referencias externas (fuentes, CSS, imágenes) y atributos x/y en la raíz
+    · solo formas y colores planos
+
+  Diseño: fondo naranja a sangre completa + la burbuja de chat en blanco con los
+  tres puntos en naranja. Es el isotipo de `DiloLogo.js` INVERTIDO a propósito:
+  Gmail recorta el avatar en círculo y lo muestra a ~30px, así que un logo con
+  fondo blanco se disolvería contra la interfaz. El naranja es lo que se
+  reconoce a ese tamaño; el wordmark "DIL" no se lee y por eso no va.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny-ps"
+     viewBox="0 0 512 512" width="512" height="512">
+  <title>DILO</title>
+
+  <rect width="512" height="512" fill="#FF441F"/>
+
+  <!-- Margen generoso a propósito: Gmail recorta el avatar en CÍRCULO, así que
+       la burbuja tiene que caber dentro del círculo inscrito, no del cuadrado. -->
+  <g transform="translate(84,80) scale(8.6)">
+    <path fill="#FFFFFF"
+          d="M20 4C10.6 4 3 10.9 3 19.4c0 3.9 1.6 7.5 4.3 10.2-.3 2.4-1.1 4.5-2.4 6.1-.5.6-.1 1.5.7 1.4 3.3-.3 5.9-1.5 7.8-2.8 2 .7 4.2 1.1 6.6 1.1 9.4 0 17-6.9 17-15.4S29.4 4 20 4Z"/>
+    <circle cx="13" cy="19" r="2.4" fill="#FF441F"/>
+    <circle cx="20" cy="19" r="2.4" fill="#FF441F"/>
+    <circle cx="27" cy="19" r="2.4" fill="#FF441F"/>
+  </g>
+</svg>

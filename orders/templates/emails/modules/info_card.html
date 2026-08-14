@@ -1,0 +1,42 @@
+{% comment %}
+MÓDULO: Information Card — filas etiqueta/valor.
+
+Uso:  {% include "emails/modules/info_card.html" with rows=rows title="Detalles del acceso" %}
+      rows = [{"label": "Fecha", "value": "8 ago 2026, 9:14 p. m."}, ...]
+      Cada fila admite "accent": True para resaltar el valor en naranja.
+
+Es el módulo que da la sensación de "producto que sabe lo que pasa": datos
+concretos, alineados, sin adornos. En móvil las columnas se apilan (dl-stack)
+porque a 320px una etiqueta y un valor largos no caben en la misma línea.
+{% endcomment %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="dl-surface"
+       style="background-color:#fbfbfa; border:1px solid #ececea; border-radius:16px;">
+  {% if title %}
+  <tr>
+    <td colspan="2" style="padding:18px 20px 0 20px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+               font-size:11px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#9a9a9f;">
+      {{ title }}
+    </td>
+  </tr>
+  {% endif %}
+  {% for row in rows %}
+  <tr>
+    <td class="dl-stack dl-stack-label" width="40%"
+        style="padding:{% if forloop.first and not title %}18px{% else %}13px{% endif %} 8px 13px 20px; vertical-align:top;
+               font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+               font-size:13px; line-height:20px; color:#8a8a8f;
+               {% if not forloop.first %}border-top:1px solid #f0f0ee;{% endif %}">
+      {{ row.label }}
+    </td>
+    <td class="dl-stack dl-stack-value dl-ink" width="60%" align="right"
+        style="padding:{% if forloop.first and not title %}18px{% else %}13px{% endif %} 20px 13px 8px; vertical-align:top;
+               font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+               font-size:14px; line-height:20px; font-weight:600; text-align:right;
+               color:{% if row.accent %}#FF441F{% else %}#0f0f10{% endif %};
+               {% if not forloop.first %}border-top:1px solid #f0f0ee;{% endif %}">
+      {{ row.value }}
+    </td>
+  </tr>
+  {% endfor %}
+  <tr><td colspan="2" style="height:6px; line-height:6px; font-size:0;">&nbsp;</td></tr>
+</table>

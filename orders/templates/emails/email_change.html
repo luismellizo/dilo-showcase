@@ -1,0 +1,50 @@
+{% extends "emails/base.html" %}
+{% comment %}
+VARIANTE 4 — Confirmación de cambio de correo.
+
+Este correo va al buzón NUEVO (es el que hay que probar que existe). El aviso
+al buzón viejo es otro envío distinto — nunca se mezclan: quien controla el
+correo nuevo no debe poder ver ni cancelar desde aquí lo que le llega al viejo.
+
+La tarjeta muestra el "de → a" para que el usuario detecte de un vistazo un
+cambio que no pidió.
+
+Contexto esperado:
+  confirm_url, ttl_label, greeting_name (opc.), old_email, new_email
+{% endcomment %}
+
+{% block title %}Confirma tu nuevo correo en DILO{% endblock %}
+{% block preheader %}Un clic para activar {{ new_email }} en tu cuenta. Vence en {{ ttl_label }}.{% endblock %}
+
+{% block hero_eyebrow %}
+<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+            font-size:11px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase; color:#FF441F; padding-bottom:12px;">
+  Datos de la cuenta
+</div>
+{% endblock %}
+
+{% block hero_title %}Confirma tu nuevo<br>correo electrónico{% endblock %}
+
+{% block hero_subtitle %}
+<p class="dl-muted" style="margin:12px 0 0 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+          font-size:15px; line-height:24px; color:#77777c;">
+  {% if greeting_name %}{{ greeting_name }}, p{% else %}P{% endif %}ediste cambiar el correo de tu cuenta DILO.
+  Confírmalo desde este buzón para activarlo.
+</p>
+{% endblock %}
+
+{% block content %}
+  {% include "emails/modules/info_card.html" with rows=rows title="El cambio" %}
+
+  {% include "emails/modules/spacer.html" with h=28 %}
+
+  {% include "emails/modules/button.html" with url=confirm_url label="Confirmar este correo" %}
+
+  {% include "emails/modules/spacer.html" with h=20 %}
+
+  {% include "emails/modules/link_fallback.html" with url=confirm_url %}
+
+  {% include "emails/modules/spacer.html" with h=26 %}
+
+  {% include "emails/modules/security_alert.html" with heading="Hasta que confirmes, nada cambia" text="Tu correo actual sigue siendo el de acceso. La solicitud vence en "|add:ttl_label|add:" y, si no fuiste tú, basta con ignorar este mensaje." %}
+{% endblock %}

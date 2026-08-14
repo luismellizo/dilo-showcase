@@ -1,0 +1,16 @@
+DILO — Actividad de la cuenta
+
+{% if greeting_name %}{{ greeting_name }}, s{% else %}S{% endif %}e inició sesión en tu cuenta de DILO.
+Si fuiste tú, no tienes que hacer nada.
+
+{% for row in rows %}{{ row.label }}: {{ row.value }}
+{% endfor %}
+Revisar tu actividad:
+{{ account_url }}
+
+¿No reconoces este acceso? Cambia tu contraseña de inmediato y revisa la
+actividad reciente.
+
+—
+{{ company_name }} · {{ site_url }}
+Correo automático de tu cuenta; no hace falta responderlo.

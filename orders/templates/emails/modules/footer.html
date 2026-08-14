@@ -1,0 +1,62 @@
+{% comment %}
+MÓDULO: Footer — wordmark, promesa de marca, legal.
+
+Fuera de la tarjeta blanca a propósito: baja el peso visual y deja que el
+contenido sea el protagonista. Los datos legales salen de companyInfo del
+backend vía contexto (`company_name`, `company_city`, `year`), con defaults
+para que un correo nunca se caiga por un dato faltante.
+{% endcomment %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td align="center" style="padding:0 16px;">
+
+      {% comment %}Mismo logo del header, en versión pequeña y en gris: el pie
+      firma, no compite con el contenido. La burbuja mantiene el naranja.{% endcomment %}
+      <table role="img" aria-label="DILO" cellpadding="0" cellspacing="0" border="0" align="center">
+        <tr>
+          <td style="vertical-align:middle; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                     font-size:17px; font-weight:800; letter-spacing:-0.8px; color:#77777c; line-height:20px;">
+            DIL
+          </td>
+          <td style="padding-left:2px; vertical-align:middle;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" valign="middle" width="22" height="19"
+                    style="width:22px; height:19px; background-color:#FF441F; border-radius:10px 10px 10px 3px;
+                           font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                           font-size:10px; font-weight:700; color:#ffffff; line-height:19px; text-align:center;
+                           letter-spacing:1px; text-indent:1px;" aria-hidden="true">&#8226;&#8226;&#8226;</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <p class="dl-muted" style="margin:12px 0 0 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                font-size:13px; line-height:20px; color:#8a8a8f;">
+        {{ footer_tagline|default:"Ventas por WhatsApp, atendidas por IA." }}
+      </p>
+
+      {% if footer_extra %}
+        <p class="dl-muted" style="margin:10px 0 0 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                  font-size:12px; line-height:19px; color:#9a9a9f;">{{ footer_extra }}</p>
+      {% endif %}
+
+      <p class="dl-muted" style="margin:16px 0 0 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                font-size:12px; line-height:18px; color:#a3a3a8;">
+        <a href="{{ site_url|default:'https://dilo.example.com' }}" style="color:#8a8a8f; text-decoration:underline;">dilo.example.com</a>
+        &nbsp;·&nbsp;
+        <a href="{{ site_url|default:'https://dilo.example.com' }}/privacy" style="color:#8a8a8f; text-decoration:underline;">Privacidad</a>
+        &nbsp;·&nbsp;
+        <a href="{{ site_url|default:'https://dilo.example.com' }}/terms" style="color:#8a8a8f; text-decoration:underline;">Términos</a>
+      </p>
+
+      <p class="dl-muted" style="margin:10px 0 0 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                font-size:11px; line-height:17px; color:#b3b3b8;">
+        © {{ year }} {{ company_name|default:"DILO" }}{% if company_city %} · {{ company_city }}{% endif %}.
+        Este es un correo automático de tu cuenta; no hace falta responderlo.
+      </p>
+
+    </td>
+  </tr>
+</table>

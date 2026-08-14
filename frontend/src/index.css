@@ -1,0 +1,431 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Tipografía
+   ----------
+   Roboto Flex  → TODO el panel (`/dashboard/*`, `/admin/*`). Variable: un solo
+                  archivo cubre 300-700, así que "una familia" no cuesta peso.
+   Space Grotesk→ solo el landing público y el modal de auth, que tienen su
+                  propio lenguaje de marca (negro + naranja) y quedan fuera de
+                  este rediseño.
+   Se eliminaron Doto, Space Mono e Inter: no las usaba ningún componente
+   (las utilidades .font-display/.font-data/.font-ui estaban muertas). */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..700&family=Space+Grotesk:wght@400;500;700&display=swap');
+
+@import './tokens.css';
+
+:root {
+  /* Fondo del shell antes de que ThemeContext escriba `data-theme`. */
+  --app-bg: #131314;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background: #050505;
+    color: #f5f5f5;
+    /* El landing conserva su tipografía de marca. El panel la pisa en
+       `.app-shell` con la familia del design system. */
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  /* Controles legibles sobre superficies claras fuera del panel (el body es
+     oscuro por el landing). Dentro del panel manda el bloque [data-theme]. */
+  input,
+  textarea,
+  select {
+    color: #111827;
+  }
+
+  select {
+    background-color: #ffffff;
+  }
+
+  select option {
+    color: #111827;
+    background-color: #ffffff;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #9ca3af;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+/* ============================================================================
+   SHELL DEL PANEL
+   La raíz de `/dashboard/*` lleva `.app-shell` + `data-theme="<preset>"`.
+   ========================================================================== */
+.app-shell {
+  min-height: 100vh;
+  background: var(--app-bg);
+  color: var(--on-surface);
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
+  font-variation-settings: 'opsz' 16;
+  font-feature-settings: 'tnum';
+  letter-spacing: var(--tracking-tight);
+}
+
+/* ============================================================================
+   UTILIDADES SEMÁNTICAS
+   Nombres de rol, no de color. Todo componente nuevo usa estas; ningún
+   componente escribe un hex.
+   ========================================================================== */
+@layer utilities {
+  /* Los roles de COLOR (`bg-surface-container`, `text-on-surface-variant`,
+     `border-outline-variant`, `text-primary`…) los genera Tailwind desde
+     tailwind.config.js. Aquí solo va lo que Tailwind no puede expresar:
+     tipografía compuesta y ancho de contenido. */
+
+  /* -- tipografía M3 -- */
+  .type-display  { font-size: var(--type-display-size);  line-height: var(--type-display-line);  font-weight: var(--type-display-weight); }
+  .type-headline { font-size: var(--type-headline-size); line-height: var(--type-headline-line); font-weight: var(--type-headline-weight); }
+  .type-title-lg { font-size: var(--type-title-lg-size); line-height: var(--type-title-lg-line); font-weight: var(--type-title-lg-weight); }
+  .type-title    { font-size: var(--type-title-size);    line-height: var(--type-title-line);    font-weight: var(--type-title-weight); }
+  .type-body-lg  { font-size: var(--type-body-lg-size);  line-height: var(--type-body-lg-line);  font-weight: var(--type-body-lg-weight); }
+  .type-body     { font-size: var(--type-body-size);     line-height: var(--type-body-line);     font-weight: var(--type-body-weight); }
+  .type-body-sm  { font-size: var(--type-body-sm-size);  line-height: var(--type-body-sm-line);  font-weight: var(--type-body-sm-weight); }
+  .type-label-lg { font-size: var(--type-label-lg-size); line-height: var(--type-label-lg-line); font-weight: var(--type-label-lg-weight); letter-spacing: var(--tracking-label); }
+  .type-label    { font-size: var(--type-label-size);    line-height: var(--type-label-line);    font-weight: var(--type-label-weight); letter-spacing: var(--tracking-label); }
+
+  /* -- ancho de contenido -- */
+  .content-width { max-width: var(--content-max); margin-inline: auto; width: 100%; }
+  .content-width-wide { max-width: var(--content-wide); margin-inline: auto; width: 100%; }
+
+  /* Tiras que se desplazan en horizontal (tabs, chips, columnas del Kanban):
+     el desplazamiento existe, la barra no se dibuja. Una barra de scroll
+     debajo de unas tabs es ruido, no información. */
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { width: 0; height: 0; display: none; }
+}
+
+/* ----------------------------------------------------------------------------
+   CAPA DE ESTADO (state layer) de Material 3.
+   Un velo del color de CONTENIDO encima de la superficie. Reemplaza los
+   `hover:bg-gray-100` fijos, que en tema oscuro se ven como un parche gris.
+   Uso: <button class="state-layer"> — o `state-layer state-on-primary` cuando
+   el contenido es claro sobre relleno de acento.
+   -------------------------------------------------------------------------- */
+.state-layer {
+  position: relative;
+  isolation: isolate;
+  --state-color: var(--on-surface);
+}
+
+.state-layer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--state-color);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-short) var(--ease-standard);
+  z-index: -1;
+}
+
+.state-layer:hover::after { opacity: var(--state-hover); }
+.state-layer:focus-visible::after { opacity: var(--state-focus); }
+.state-layer:active::after { opacity: var(--state-press); }
+.state-layer[aria-disabled='true']::after,
+.state-layer:disabled::after { opacity: 0; }
+
+/* Deshabilitado según M3: el contenido baja al 38 % y el contenedor al 12 %
+   del color `on-surface`. Bajar la opacidad del botón entero (lo que hacía
+   `disabled:opacity-50`) apaga también el fondo de la página que se ve detrás
+   y deja el botón "sucio" en vez de apagado. */
+.btn-disabled:disabled {
+  background: color-mix(in srgb, var(--on-surface) var(--state-disabled-surface-pct, 12%), transparent) !important;
+  color: color-mix(in srgb, var(--on-surface) 38%, transparent) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.state-on-primary { --state-color: var(--on-primary); }
+.state-on-secondary-container { --state-color: var(--on-secondary-container); }
+.state-primary { --state-color: var(--primary); }
+
+/* ============================================================================
+   ACENTO — clases heredadas. Se conservan para no romper componentes que aún
+   las usan; ahora apuntan a roles, no al hex del acento.
+   ========================================================================== */
+[data-theme] .accent-bg { background-color: var(--primary) !important; }
+[data-theme] .accent-text { color: var(--primary) !important; }
+[data-theme] .accent-border { border-color: var(--primary) !important; }
+[data-theme] .accent-soft-bg { background-color: var(--secondary-container) !important; }
+
+[data-theme] ::selection {
+  background: color-mix(in srgb, var(--primary) 30%, transparent);
+  color: var(--on-surface);
+}
+
+/* ============================================================================
+   FOCO VISIBLE — un solo tratamiento en todo el panel.
+   Anillo de 3px del color `primary` (tono claro en oscuro, oscuro en claro) →
+   siempre por encima de 3:1 contra la superficie, que es lo que exige AA para
+   indicadores no textuales. El ring anterior era `--accent` al 30 %: ~2:1.
+   ========================================================================== */
+[data-theme] :focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--shape-xs);
+}
+
+[data-theme] input:focus-visible,
+[data-theme] textarea:focus-visible,
+[data-theme] select:focus-visible {
+  outline: none;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 1px var(--primary) !important;
+}
+
+[data-theme] input,
+[data-theme] textarea,
+[data-theme] select {
+  transition:
+    border-color var(--motion-short) var(--ease-standard),
+    box-shadow var(--motion-short) var(--ease-standard),
+    background-color var(--motion-short) var(--ease-standard);
+}
+
+[data-theme] button {
+  transition-property: color, background-color, border-color, box-shadow, opacity;
+  transition-duration: var(--motion-short);
+  transition-timing-function: var(--ease-standard);
+}
+
+/* ============================================================================
+   REMAPEO DE UTILIDADES DE TAILWIND → ROLES DEL TEMA
+   ----------------------------------------------------------------------------
+   El panel se escribió con utilidades de tema claro (`bg-white`,
+   `text-gray-500`, `border-gray-200`). En vez de reescribir 14.000 líneas, se
+   traducen a roles UNA sola vez. Antes este bloque estaba triplicado con hex
+   crudos por preset; ahora es único y los valores viven en tokens.css.
+
+   Componente nuevo → usar las utilidades semánticas de arriba, no estas.
+   ========================================================================== */
+[data-theme] .bg-white { background-color: var(--surface-container-low) !important; }
+[data-theme] .bg-white\/80,
+[data-theme] .bg-white\/90,
+[data-theme] .bg-white\/60,
+[data-theme] .bg-white\/50 { background-color: color-mix(in srgb, var(--surface-container-low) 88%, transparent) !important; }
+[data-theme] .bg-gray-50 { background-color: var(--surface-container) !important; }
+[data-theme] .bg-gray-50\/60,
+[data-theme] .bg-gray-50\/80 { background-color: color-mix(in srgb, var(--surface-container) 85%, transparent) !important; }
+[data-theme] .bg-gray-100 { background-color: var(--surface-container-high) !important; }
+[data-theme] .bg-gray-200 { background-color: var(--surface-container-highest) !important; }
+
+[data-theme] .text-gray-900,
+[data-theme] .text-gray-800 { color: var(--on-surface) !important; }
+[data-theme] .text-gray-700,
+[data-theme] .text-gray-600 { color: var(--on-surface-variant) !important; }
+/* gray-500/400 eran subtítulos, hints y timestamps: se suben a un tono que sí
+   pasa AA (4.5:1) en vez del gris apagado anterior (~3.9:1). */
+[data-theme] .text-gray-500,
+[data-theme] .text-gray-400,
+[data-theme] .text-gray-300 { color: var(--on-surface-muted) !important; }
+
+[data-theme] .border-gray-200,
+[data-theme] .border-gray-100,
+[data-theme] .border-gray-300 { border-color: var(--outline-variant) !important; }
+[data-theme] .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+[data-theme] .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: var(--outline-variant) !important; }
+
+[data-theme] .hover\:bg-gray-50:hover,
+[data-theme] .hover\:bg-gray-100:hover,
+[data-theme] .hover\:bg-white:hover { background-color: var(--surface-container-high) !important; }
+[data-theme] .hover\:text-gray-900:hover { color: var(--on-surface) !important; }
+
+/* -- paletas semánticas de Tailwind → roles de estado -------------------- */
+[data-theme] .bg-green-50, [data-theme] .bg-green-100, [data-theme] .bg-emerald-50 { background-color: var(--success-container) !important; }
+[data-theme] .text-green-700, [data-theme] .text-green-800, [data-theme] .text-green-600, [data-theme] .text-emerald-700 { color: var(--on-success-container) !important; }
+[data-theme] .border-green-100, [data-theme] .border-green-200 { border-color: color-mix(in srgb, var(--success) 40%, transparent) !important; }
+
+[data-theme] .bg-amber-50, [data-theme] .bg-amber-100, [data-theme] .bg-yellow-50, [data-theme] .bg-yellow-100 { background-color: var(--warning-container) !important; }
+[data-theme] .text-amber-700, [data-theme] .text-amber-800, [data-theme] .text-amber-600, [data-theme] .text-yellow-700 { color: var(--on-warning-container) !important; }
+[data-theme] .border-amber-100, [data-theme] .border-amber-200, [data-theme] .border-yellow-300 { border-color: color-mix(in srgb, var(--warning) 40%, transparent) !important; }
+
+[data-theme] .bg-red-50, [data-theme] .bg-red-100 { background-color: var(--error-container) !important; }
+[data-theme] .text-red-700, [data-theme] .text-red-600, [data-theme] .text-red-500 { color: var(--on-error-container) !important; }
+[data-theme] .border-red-100, [data-theme] .border-red-200, [data-theme] .border-red-300 { border-color: color-mix(in srgb, var(--error) 45%, transparent) !important; }
+
+[data-theme] .bg-blue-50, [data-theme] .bg-blue-100 { background-color: var(--info-container) !important; }
+[data-theme] .text-blue-700, [data-theme] .text-blue-600 { color: var(--on-info-container) !important; }
+[data-theme] .border-blue-100, [data-theme] .border-blue-200 { border-color: color-mix(in srgb, var(--info) 40%, transparent) !important; }
+
+/* -- controles de formulario --------------------------------------------
+   Se usa `:where()` a propósito: deja la regla en especificidad (0,0,1), o
+   sea por DEBAJO de cualquier utilidad de Tailwind. Así esto es solo el
+   valor por defecto del tema y un `bg-transparent` en un buscador, o un tono
+   distinto en un campo de solo lectura, ganan sin pelear con `!important`.
+   La versión anterior llevaba `!important` y hacía imposible un input
+   transparente dentro del panel.                                          */
+:where([data-theme]) input,
+:where([data-theme]) textarea,
+:where([data-theme]) select {
+  background-color: var(--surface-container-highest);
+  color: var(--on-surface);
+  border-color: var(--outline);
+}
+
+:where([data-theme]) select option {
+  background-color: var(--surface-container-high);
+  color: var(--on-surface);
+}
+
+:where([data-theme]) input::placeholder,
+:where([data-theme]) textarea::placeholder { color: var(--on-surface-muted); }
+
+/* -- elevación ----------------------------------------------------------
+   En M3 dark la elevación es TONO, no sombra: una sombra negra sobre un fondo
+   casi negro no se ve y solo ensucia. Las utilidades shadow-* del código
+   antiguo se convierten en el nivel de sombra del tema (sutil en claro, casi
+   nulo en oscuro).                                                        */
+[data-theme] .shadow-sm { box-shadow: var(--shadow-1) !important; }
+[data-theme] .shadow,
+[data-theme] .shadow-md { box-shadow: var(--shadow-2) !important; }
+[data-theme] .shadow-lg,
+[data-theme] .shadow-xl,
+[data-theme] .shadow-2xl { box-shadow: var(--shadow-3) !important; }
+
+/* ============================================================================
+   MOVIMIENTO
+   ========================================================================== */
+@keyframes panel-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes panel-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes panel-scale-up {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes panel-slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes panel-slide-right {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.anim-fade-up { animation: panel-fade-up var(--motion-medium) var(--ease-decelerate) both; }
+.anim-fade-in { animation: panel-fade-in var(--motion-short) var(--ease-standard) both; }
+.anim-scale-up { animation: panel-scale-up var(--motion-medium) var(--ease-decelerate) both; }
+.anim-slide-up { animation: panel-slide-up var(--motion-medium) var(--ease-decelerate) both; }
+.anim-slide-right { animation: panel-slide-right var(--motion-medium) var(--ease-decelerate) both; }
+
+/* Se conserva para el landing (fuera de alcance del rediseño). */
+.fade-in { animation: panel-fade-up var(--motion-medium) var(--ease-decelerate) both; }
+
+/* -- carga -------------------------------------------------------------- */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.75; }
+}
+
+.skeleton {
+  background: var(--surface-container-highest);
+  animation: skeleton-pulse 1.6s var(--ease-standard) infinite;
+}
+
+/* -- Kanban: urgencia y arrastre ---------------------------------------- */
+@keyframes urgent-ring {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--error) 45%, transparent); }
+  50% { box-shadow: 0 0 0 5px transparent; }
+}
+
+.urgent-pulse { animation: urgent-ring 1.8s var(--ease-standard) infinite; }
+
+.drop-target {
+  outline: 2px dashed var(--primary);
+  outline-offset: 4px;
+  border-radius: var(--shape-lg);
+  background: var(--secondary-container);
+}
+
+.dragging-card { opacity: 0.45; }
+
+/* ============================================================================
+   SCROLLBARS — theme-aware (antes eran un gris fijo en los 3 presets).
+   ========================================================================== */
+[data-theme] {
+  scrollbar-color: var(--outline-variant) transparent;
+  scrollbar-width: thin;
+}
+
+[data-theme] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-theme] ::-webkit-scrollbar-thumb {
+  background: var(--outline-variant);
+  border-radius: var(--shape-full);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+[data-theme] ::-webkit-scrollbar-thumb:hover {
+  background: var(--outline);
+  background-clip: content-box;
+}
+
+[data-theme] ::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Fuera del panel (landing) se conserva la barra discreta original. */
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(125, 135, 155, 0.35); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(125, 135, 155, 0.6); }
+
+/* ============================================================================
+   ACCESIBILIDAD
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

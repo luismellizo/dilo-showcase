@@ -1,0 +1,18 @@
+DILO — Verificación
+
+{% if greeting_name %}Hola {{ greeting_name }},
+
+{% endif %}Tu código para {{ purpose|default:"continuar con el acceso a tu cuenta" }}:
+
+    {{ code }}
+
+Vence en {{ ttl_label }} y solo sirve una vez.
+{% if ip %}
+Solicitado desde la IP {{ ip }}.
+{% endif %}
+Nadie de DILO te pedirá este código: ni por WhatsApp, ni por teléfono, ni por
+correo. Si alguien te lo pide, es un intento de fraude.
+
+—
+{{ company_name }} · {{ site_url }}
+Correo automático de tu cuenta; no hace falta responderlo.

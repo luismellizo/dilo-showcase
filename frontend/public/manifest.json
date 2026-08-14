@@ -1,0 +1,35 @@
+{
+  "short_name": "DILO",
+  "name": "DILO — Vende por WhatsApp con IA",
+  "description": "Un asistente de IA atiende tu WhatsApp, toma el pedido con tu menú real y lo manda a tu cocina en tiempo real.",
+  "lang": "es-CO",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0a0a0f",
+  "background_color": "#0a0a0f"
+}

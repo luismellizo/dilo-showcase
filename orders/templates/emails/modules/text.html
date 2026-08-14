@@ -1,0 +1,15 @@
+{% comment %}
+MÓDULO: Body — párrafo de cuerpo.
+
+Uso:  {% include "emails/modules/text.html" with text="..." %}
+      ... with size="lead"   → primer párrafo, un punto más grande
+      ... with size="small"  → nota al pie del bloque
+
+Existe para que ningún correo invente su propia tipografía: interlineado y
+color salen siempre de aquí.
+{% endcomment %}
+<p class="{% if size == 'small' %}dl-muted{% else %}dl-ink{% endif %}"
+   style="margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+          {% if size == 'lead' %}font-size:16px; line-height:26px; color:#3f3f46;
+          {% elif size == 'small' %}font-size:13px; line-height:20px; color:#8a8a8f;
+          {% else %}font-size:15px; line-height:25px; color:#3f3f46;{% endif %}">{{ text }}</p>

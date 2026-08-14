@@ -1,0 +1,15 @@
+{% comment %}
+MÓDULO: Link de respaldo del CTA.
+
+Uso:  {% include "emails/modules/link_fallback.html" with url=url %}
+
+Va SIEMPRE debajo de un botón: hay clientes corporativos que reescriben o
+matan los enlaces de los botones, y usuarios que desconfían de un botón pero
+sí pegan una URL que pueden leer. `word-break` evita que una URL larga
+desborde el ancho en móvil.
+{% endcomment %}
+<p class="dl-muted" style="margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+          font-size:12px; line-height:19px; color:#9a9a9f; word-break:break-all;">
+  ¿El botón no funciona? Copia y pega este enlace:<br>
+  <a href="{{ url }}" style="color:#FF441F; text-decoration:underline;">{{ url }}</a>
+</p>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <!-- Favicon: el .ico va primero como red de seguridad para navegadores
+         viejos (y porque algunos lo piden a /favicon.ico sin mirar el HTML);
+         el SVG lo pisa en cualquier navegador moderno y se ve nítido en
+         pantallas retina y a cualquier zoom. El SVG es circular; su gemelo
+         cuadrado `bimi-dilo.svg` es el del correo (BIMI exige cuadrado). -->
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0a0a0f" />
+    <meta
+      name="description"
+      content="DILO — vende por WhatsApp con un asistente de IA que atiende a tus clientes, arma el pedido y lo manda a tu cocina en tiempo real."
+    />
+    <!-- iOS ignora el SVG y redondea las esquinas él mismo: se le da el PNG
+         cuadrado a sangre (el mismo arte del correo), nunca el circular. -->
+    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png" />
+
+    <!-- Open Graph: es lo que ve un revisor de Meta al compartir o inspeccionar
+         el sitio, y lo que Meta cruza en la Verificación del Negocio. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="DILO" />
+    <meta property="og:title" content="DILO — Vende por chat. El bot atiende, tú cocinas." />
+    <meta
+      property="og:description"
+      content="Un asistente de IA atiende tu WhatsApp, toma el pedido con tu menú real y lo manda a tu cocina en tiempo real."
+    />
+    <meta property="og:url" content="https://dilo.example.com" />
+    <meta property="og:image" content="https://dilo.example.com/logo512.png" />
+    <meta property="og:locale" content="es_CO" />
+    <meta name="twitter:card" content="summary" />
+
+    <link rel="canonical" href="https://dilo.example.com/" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    <title>DILO — Vende por WhatsApp con IA</title>
+  </head>
+  <body>
+    <noscript>
+      DILO necesita JavaScript para funcionar. Actívalo en tu navegador para
+      entrar al panel.
+    </noscript>
+    <div id="root"></div>
+  </body>
+</html>

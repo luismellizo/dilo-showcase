@@ -1,0 +1,42 @@
+{% comment %}
+MÓDULO: CTA — botón principal naranja.
+
+Uso:  {% include "emails/modules/button.html" with url=url label="Restablecer contraseña" %}
+      ... with variant="ghost"  → botón secundario de contorno
+
+"Bulletproof button": el <table> sirve a todos los clientes modernos y el bloque
+VML de abajo cubre Outlook de escritorio (que ignora padding y border-radius en
+anclas). Sin el VML, en Outlook el botón se ve como un simple link azul.
+
+Un solo CTA primario por correo. Si hay dos acciones, la segunda va en `ghost`.
+{% endcomment %}
+{% if variant == "ghost" %}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" class="dl-btn">
+  <tr>
+    <td align="center" style="border:1px solid #dcdcd8; border-radius:12px;">
+      <a href="{{ url }}" target="_blank" rel="noopener"
+         style="display:inline-block; padding:13px 26px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                font-size:14px; font-weight:700; color:#3f3f46; text-decoration:none; border-radius:12px;">{{ label }}</a>
+    </td>
+  </tr>
+</table>
+{% else %}
+<!--[if mso]>
+<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+             href="{{ url }}" style="height:50px;v-text-anchor:middle;width:300px;" arcsize="26%" stroke="f" fillcolor="#FF441F">
+  <w:anchorlock/>
+  <center style="color:#ffffff;font-family:Segoe UI,Arial,sans-serif;font-size:15px;font-weight:bold;">{{ label }}</center>
+</v:roundrect>
+<![endif]-->
+<!--[if !mso]><!-- -->
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" class="dl-btn">
+  <tr>
+    <td align="center" style="background-color:#FF441F; border-radius:13px;">
+      <a href="{{ url }}" target="_blank" rel="noopener"
+         style="display:inline-block; padding:15px 34px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                font-size:15px; font-weight:700; letter-spacing:-0.1px; color:#ffffff; text-decoration:none; border-radius:13px;">{{ label }}</a>
+    </td>
+  </tr>
+</table>
+<!--<![endif]-->
+{% endif %}

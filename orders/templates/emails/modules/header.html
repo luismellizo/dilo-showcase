@@ -1,0 +1,48 @@
+{% comment %}
+MÓDULO: Header — logo DILO.
+
+Construido con tabla y texto, NO con imagen: los clientes de correo bloquean
+imágenes remotas por defecto, así que un logo en <img> desaparece justo en el
+primer contacto con el usuario. Esta versión se ve siempre.
+
+El logo oficial es "DIL" en negro + una burbuja de chat naranja haciendo de "O",
+con los tres puntos de "escribiendo" dentro (mismo isotipo que `DiloLogo.js` en
+el frontend, ahí en SVG — aquí en tabla porque el SVG no existe en correo).
+La burbuja se arma con una celda naranja de esquinas redondeadas; la esquina
+inferior izquierda va casi recta para insinuar la cola. En Outlook de escritorio
+el border-radius se ignora y la burbuja queda rectangular: sigue leyéndose
+"DILO" y sigue siendo naranja, que es lo que sostiene el reconocimiento.
+
+`role="img"` + `aria-label` para que un lector de pantalla diga "DILO" y no
+"DIL" seguido de tres puntos sueltos.
+{% endcomment %}
+<table role="img" aria-label="DILO" cellpadding="0" cellspacing="0" border="0" align="left">
+  <tr>
+    <td style="vertical-align:middle;">
+      <span class="dl-wordmark" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                   font-size:26px; font-weight:800; letter-spacing:-1.2px; color:#0f0f10; line-height:30px;">DIL</span>
+    </td>
+    <td style="padding-left:3px; vertical-align:middle;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td align="center" valign="middle" width="34" height="29"
+              style="width:34px; height:29px; background-color:#FF441F; border-radius:15px 15px 15px 5px;
+                     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                     font-size:15px; font-weight:700; color:#ffffff; line-height:29px; text-align:center;
+                     letter-spacing:1.5px; text-indent:1.5px;" aria-hidden="true">
+            &#8226;&#8226;&#8226;
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="right" class="dl-hide-sm">
+  <tr>
+    <td style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+               font-size:12px; font-weight:600; color:#9a9a9f; letter-spacing:0.2px; padding-top:10px;">
+      {{ header_tag|default:"Cuenta y seguridad" }}
+    </td>
+  </tr>
+</table>
+<div style="clear:both; line-height:0; font-size:0;">&nbsp;</div>

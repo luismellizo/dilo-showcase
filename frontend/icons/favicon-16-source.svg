@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  FUENTE del corte de 16px del favicon.ico. NO se sirve al navegador (esta
+  carpeta queda fuera de `public/`, así que CRA no la copia al build).
+
+  Por qué existe: a 16px los tres puntos de la burbuja se funden en una sola
+  raya y el icono pasa a leerse como una señal de "prohibido". A ese tamaño
+  gana la silueta: burbuja blanca sólida, sin puntos, y un poco más grande para
+  que el trazo naranja del borde no se la coma.
+
+  Regenerar el .ico (los tres cortes, desde frontend/public/):
+    rsvg-convert -w 16 -h 16 ../icons/favicon-16-source.svg -o /tmp/f16.png
+    rsvg-convert -w 32 -h 32 favicon.svg -o /tmp/f32.png
+    rsvg-convert -w 48 -h 48 favicon.svg -o /tmp/f48.png
+    magick /tmp/f16.png /tmp/f32.png /tmp/f48.png favicon.ico
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>DILO</title>
+  <circle cx="256" cy="256" r="256" fill="#FF441F"/>
+  <g transform="translate(72,68) scale(9.2)">
+    <path fill="#FFFFFF"
+          d="M20 4C10.6 4 3 10.9 3 19.4c0 3.9 1.6 7.5 4.3 10.2-.3 2.4-1.1 4.5-2.4 6.1-.5.6-.1 1.5.7 1.4 3.3-.3 5.9-1.5 7.8-2.8 2 .7 4.2 1.1 6.6 1.1 9.4 0 17-6.9 17-15.4S29.4 4 20 4Z"/>
+  </g>
+</svg>

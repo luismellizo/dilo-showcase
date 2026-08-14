@@ -1,0 +1,228 @@
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # OJO: sin anchors YAML (&/*) — el importador de compose del PaaS falla
+  # con ellos. Si agregas una env var nueva, agrégala en backend, celery Y
+  # celery-beat (tres bloques identicos).
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - "8000"
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: ${DEBUG:-False}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost}
+      DB_ENGINE: ${DB_ENGINE:-postgresql}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-dilo}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      WHATSAPP_API_TOKEN: ${WHATSAPP_API_TOKEN}
+      WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID}
+      WHATSAPP_VERIFY_TOKEN: ${WHATSAPP_VERIFY_TOKEN}
+      META_APP_ID: ${META_APP_ID}
+      META_APP_SECRET: ${META_APP_SECRET}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      BACKEND_PUBLIC_URL: ${BACKEND_PUBLIC_URL:-https://dilo.example.com}
+      AI_PROVIDER: ${AI_PROVIDER:-openrouter}
+      AI_MODEL: ${AI_MODEL:-google/gemini-2.5-flash}
+      AI_VISION_MODEL: ${AI_VISION_MODEL:-google/gemini-2.5-flash}
+      AI_IMAGE_MODEL: ${AI_IMAGE_MODEL:-google/gemini-2.5-flash-image}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      GOOGLE_VISION_API_KEY: ${GOOGLE_VISION_API_KEY}
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}
+      # Correo saliente (codigo de acceso al panel interno /admin/login)
+      EMAIL_HOST: ${EMAIL_HOST:-smtp.example.com}
+      EMAIL_PORT: ${EMAIL_PORT:-465}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER:-hola@example.com}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-}
+      # Panel interno: dominios del equipo y vida del codigo (segundos)
+      STAFF_EMAIL_DOMAINS: ${STAFF_EMAIL_DOMAINS:-dilo.example.com}
+      STAFF_MFA_CODE_TTL: ${STAFF_MFA_CODE_TTL:-180}
+      STAFF_SESSION_HOURS: ${STAFF_SESSION_HOURS:-2}
+      FRONTEND_URL: ${FRONTEND_URL:-https://app.dilo.example.com}
+      WOMPI_PUBLIC_KEY: ${WOMPI_PUBLIC_KEY}
+      BOLD_API_KEY: ${BOLD_API_KEY}
+      TRIAL_DAYS: ${TRIAL_DAYS:-14}
+      CONVERSATION_WINDOW_HOURS: ${CONVERSATION_WINDOW_HOURS:-24}
+      BOT_PAUSE_MINUTES: ${BOT_PAUSE_MINUTES:-60}
+      WINBACK_DAYS: ${WINBACK_DAYS:-14}
+      WINBACK_COOLDOWN_DAYS: ${WINBACK_COOLDOWN_DAYS:-14}
+      WHATSAPP_WINBACK_TEMPLATE: ${WHATSAPP_WINBACK_TEMPLATE:-}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - media_files:/app/media
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python -m celery -A whatsapp_orders worker -l info
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: ${DEBUG:-False}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost}
+      DB_ENGINE: ${DB_ENGINE:-postgresql}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-dilo}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      WHATSAPP_API_TOKEN: ${WHATSAPP_API_TOKEN}
+      WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID}
+      WHATSAPP_VERIFY_TOKEN: ${WHATSAPP_VERIFY_TOKEN}
+      META_APP_ID: ${META_APP_ID}
+      META_APP_SECRET: ${META_APP_SECRET}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      BACKEND_PUBLIC_URL: ${BACKEND_PUBLIC_URL:-https://dilo.example.com}
+      AI_PROVIDER: ${AI_PROVIDER:-openrouter}
+      AI_MODEL: ${AI_MODEL:-google/gemini-2.5-flash}
+      AI_VISION_MODEL: ${AI_VISION_MODEL:-google/gemini-2.5-flash}
+      AI_IMAGE_MODEL: ${AI_IMAGE_MODEL:-google/gemini-2.5-flash-image}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      GOOGLE_VISION_API_KEY: ${GOOGLE_VISION_API_KEY}
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}
+      # Correo saliente (codigo de acceso al panel interno /admin/login)
+      EMAIL_HOST: ${EMAIL_HOST:-smtp.example.com}
+      EMAIL_PORT: ${EMAIL_PORT:-465}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER:-hola@example.com}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-}
+      # Panel interno: dominios del equipo y vida del codigo (segundos)
+      STAFF_EMAIL_DOMAINS: ${STAFF_EMAIL_DOMAINS:-dilo.example.com}
+      STAFF_MFA_CODE_TTL: ${STAFF_MFA_CODE_TTL:-180}
+      STAFF_SESSION_HOURS: ${STAFF_SESSION_HOURS:-2}
+      FRONTEND_URL: ${FRONTEND_URL:-https://app.dilo.example.com}
+      WOMPI_PUBLIC_KEY: ${WOMPI_PUBLIC_KEY}
+      BOLD_API_KEY: ${BOLD_API_KEY}
+      TRIAL_DAYS: ${TRIAL_DAYS:-14}
+      CONVERSATION_WINDOW_HOURS: ${CONVERSATION_WINDOW_HOURS:-24}
+      BOT_PAUSE_MINUTES: ${BOT_PAUSE_MINUTES:-60}
+      WINBACK_DAYS: ${WINBACK_DAYS:-14}
+      WINBACK_COOLDOWN_DAYS: ${WINBACK_COOLDOWN_DAYS:-14}
+      WHATSAPP_WINBACK_TEMPLATE: ${WHATSAPP_WINBACK_TEMPLATE:-}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+    depends_on:
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    volumes:
+      - media_files:/app/media
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python -m celery -A whatsapp_orders beat -l info
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: ${DEBUG:-False}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost}
+      DB_ENGINE: ${DB_ENGINE:-postgresql}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-dilo}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      WHATSAPP_API_TOKEN: ${WHATSAPP_API_TOKEN}
+      WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID}
+      WHATSAPP_VERIFY_TOKEN: ${WHATSAPP_VERIFY_TOKEN}
+      META_APP_ID: ${META_APP_ID}
+      META_APP_SECRET: ${META_APP_SECRET}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      BACKEND_PUBLIC_URL: ${BACKEND_PUBLIC_URL:-https://dilo.example.com}
+      AI_PROVIDER: ${AI_PROVIDER:-openrouter}
+      AI_MODEL: ${AI_MODEL:-google/gemini-2.5-flash}
+      AI_VISION_MODEL: ${AI_VISION_MODEL:-google/gemini-2.5-flash}
+      AI_IMAGE_MODEL: ${AI_IMAGE_MODEL:-google/gemini-2.5-flash-image}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      GOOGLE_VISION_API_KEY: ${GOOGLE_VISION_API_KEY}
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}
+      # Correo saliente (codigo de acceso al panel interno /admin/login)
+      EMAIL_HOST: ${EMAIL_HOST:-smtp.example.com}
+      EMAIL_PORT: ${EMAIL_PORT:-465}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER:-hola@example.com}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-}
+      # Panel interno: dominios del equipo y vida del codigo (segundos)
+      STAFF_EMAIL_DOMAINS: ${STAFF_EMAIL_DOMAINS:-dilo.example.com}
+      STAFF_MFA_CODE_TTL: ${STAFF_MFA_CODE_TTL:-180}
+      STAFF_SESSION_HOURS: ${STAFF_SESSION_HOURS:-2}
+      FRONTEND_URL: ${FRONTEND_URL:-https://app.dilo.example.com}
+      WOMPI_PUBLIC_KEY: ${WOMPI_PUBLIC_KEY}
+      BOLD_API_KEY: ${BOLD_API_KEY}
+      TRIAL_DAYS: ${TRIAL_DAYS:-14}
+      CONVERSATION_WINDOW_HOURS: ${CONVERSATION_WINDOW_HOURS:-24}
+      BOT_PAUSE_MINUTES: ${BOT_PAUSE_MINUTES:-60}
+      WINBACK_DAYS: ${WINBACK_DAYS:-14}
+      WINBACK_COOLDOWN_DAYS: ${WINBACK_COOLDOWN_DAYS:-14}
+      WHATSAPP_WINBACK_TEMPLATE: ${WHATSAPP_WINBACK_TEMPLATE:-}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+    depends_on:
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    volumes:
+      - media_files:/app/media
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL:-https://dilo.example.com}
+        REACT_APP_GOOGLE_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}
+        REACT_APP_META_APP_ID: ${META_APP_ID:-}
+        REACT_APP_META_CONFIG_ID: ${META_CONFIG_ID:-}
+        REACT_APP_META_GRAPH_VERSION: ${META_GRAPH_API_VERSION:-v23.0}
+    restart: unless-stopped
+    expose:
+      - "80"
+    depends_on:
+      - backend
+
+volumes:
+  redis_data:
+  media_files:
