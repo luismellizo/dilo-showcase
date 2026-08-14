@@ -1,4 +1,10 @@
-name: CI/CD
+# CI del snapshot público de DILO.
+#
+# Solo verificación: checks de Django, guardia de deriva de migraciones, tests
+# y build del frontend. El repo privado tiene además un job de despliegue que
+# publica los cuatro servicios (backend, worker, beat, frontend); aquí se omite
+# a propósito — este snapshot está congelado y no se despliega a ninguna parte.
+name: CI
 
 on:
   push:
@@ -57,36 +63,16 @@ jobs:
       - name: Build
         run: CI=true npm run build
 
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    needs: [backend, frontend]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    env:
-      DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
-      DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
-      # Un solo push a main redespliega los CUATRO servicios: backend, worker
-      # de Celery, beat y frontend. Antes solo se disparaba el backend y el
-      # frontend quedaba servido con el bundle viejo — un despliegue parcial
-      # es peor que ninguno, porque la SPA habla con una API que ya cambió.
-      #
-      # ⚠️ Identificadores de las apps y proveedor de deploy omitidos en este
-      #    snapshot público. En el repo privado son 4 UUIDs fijos.
-      APP_IDS: >-
-        app-backend
-        app-worker
-        app-beat
-        app-frontend
-    steps:
-      - name: Trigger deployments (backend, worker, beat, frontend)
-        if: env.DEPLOY_URL != '' && env.DEPLOY_TOKEN != ''
-        run: |
-          for id in $APP_IDS; do
-            echo "Deploying $id"
-            curl -fsS --retry 3 \
-              -H "Authorization: Bearer $DEPLOY_TOKEN" \
-              "$DEPLOY_URL/api/v1/deploy?uuid=$id&force=false"
-          done
-      - name: Secrets missing notice
-        if: env.DEPLOY_URL == '' || env.DEPLOY_TOKEN == ''
-        run: echo "::warning::DEPLOY_URL / DEPLOY_TOKEN sin configurar — deploy omitido (CI verde igual)"
+# Nota sobre el despliegue
+# ------------------------
+# El repo privado tiene aquí un tercer job que, tras pasar backend y frontend,
+# redespliega los CUATRO servicios de una sola vez: backend, worker de Celery,
+# beat y frontend.
+#
+# El detalle de diseño que importa: al principio solo se disparaba el backend, y
+# el frontend seguía servido con el bundle anterior. Un despliegue parcial es
+# peor que ninguno — la SPA queda hablando con una API que ya cambió de
+# contrato. Por eso un push a main los mueve a los cuatro o a ninguno.
+#
+# Ese job no existe en este snapshot: está congelado y no se despliega a
+# ninguna parte.
