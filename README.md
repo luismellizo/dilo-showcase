@@ -207,18 +207,51 @@ consecuencia.
 
 📁 `orders/bot_engine.py::_redact_payment_leak`
 
-### 3. Aislamiento multi-tenant en dos capas
+### 3. Aislamiento multi-tenant, y qué lo garantiza realmente
 
 Un bug de autorización en un SaaS multi-tenant significa que un restaurante ve
-los pedidos de otro. Confiar solo en el filtrado de la aplicación es confiar en
-que ningún endpoint futuro olvide un `.filter(owner=request.user)`.
+los pedidos de otro. No es un bug de UX: es una fuga de datos entre clientes
+que compiten entre sí.
 
-El aislamiento se aplica en dos niveles independientes: filtrado por propietario
-en los querysets, **y** constraints a nivel de base de datos que hacen imposible
-persistir una relación cruzada entre tiendas. Para filtrar mal hay que
-equivocarse en los dos.
+El aislamiento se aplica **en la capa de aplicación**, filtrando desde la
+relación hacia el dueño autenticado, con el mismo patrón en todos los
+querysets:
 
-📁 `orders/models.py` · `orders/staff_permissions.py`
+```python
+Product.objects.filter(category__store__owner=self.request.user)
+Order.objects.filter(store__owner=self.request.user)
+```
+
+Las escrituras además verifican la propiedad de forma explícita: un `POST` que
+referencia un `store_id` ajeno no lo cubre el queryset de lectura.
+
+La base de datos aporta una capa **distinta**, no redundante: la unicidad está
+alcanzada por tienda (`unique_together = ['store', 'name']`,
+`['store', 'channel_id', 'channel_type']`). Eso resuelve una pregunta de
+modelado, no de autorización: el mismo número de WhatsApp que pide en dos
+restaurantes son **dos clientes distintos**, con historiales que jamás se
+cruzan. Un comercio no puede ver qué pidió su cliente en otro lado.
+
+Y una constraint parcial que cubre otro problema — la idempotencia de webhooks:
+
+```python
+models.UniqueConstraint(
+    fields=['platform', 'external_id'],
+    condition=models.Q(external_id__isnull=False),
+    name='unique_platform_external_id',
+)
+```
+
+Meta reintenta cualquier webhook que no conteste rápido. El duplicado falla en
+el motor de la base de datos, no en un `if` que se puede olvidar.
+
+**Límite conocido:** la garantía de aislamiento vive en la aplicación. Es
+consistente y está cubierta por tests, pero no es estructural — un endpoint
+futuro que olvide filtrar abriría un hueco. Mover esa garantía al motor (RLS de
+Postgres, o un manager por defecto que fuerce el filtro) es el siguiente paso
+natural si el equipo creciera.
+
+📁 `orders/views.py` · `orders/models.py` · `orders/staff_permissions.py`
 
 ### 4. Enforcement de facturación *fail-open*
 
