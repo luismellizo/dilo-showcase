@@ -372,4 +372,4 @@ Ver [LICENSE](LICENSE) para el texto completo.
 
 ---
 
-<sub>Construido por Luis Mellizo · Bucaramanga, Colombia</sub>
+<sub>Construido por Luis Mellizo · Bogotá, Colombia</sub>
