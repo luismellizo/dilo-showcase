@@ -7,6 +7,8 @@ Each merchant sets up their store once. From then on an AI bot serves their
 customers 24/7: shows the menu, builds the order, takes payment, verifies the
 transfer receipt and drops it in the kitchen in real time.
 
+[![Live](https://img.shields.io/badge/▶_Live-dilo.lat-25D366?style=for-the-badge)](https://dilo.lat)
+
 ![Django](https://img.shields.io/badge/Django-5.x-092E20?style=flat-square&logo=django)
 ![DRF](https://img.shields.io/badge/DRF-REST_API-A30000?style=flat-square)
 ![Channels](https://img.shields.io/badge/Channels-WebSocket-44B78B?style=flat-square)
@@ -352,8 +354,8 @@ pytest
 
 ## Project status
 
-In production with pilot merchants in Bucaramanga, Colombia. Active development
-continues in a private repository.
+Live at **[dilo.lat](https://dilo.lat)**, in production with pilot merchants in
+Bucaramanga, Colombia. Active development continues in a private repository.
 
 **This repository is a frozen snapshot** taken to show the work. It receives no
 updates and does not reflect the current state of the product.
