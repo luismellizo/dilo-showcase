@@ -1,10 +1,11 @@
-# DILO — Vende por chat. El bot atiende, tú cocinas.
+# DILO — Sell over chat. The bot takes orders, you cook.
 
-**SaaS de ventas conversacionales por WhatsApp para restaurantes y comercios en LatAm.**
+**Conversational commerce SaaS over WhatsApp for restaurants and small merchants
+in Latin America.**
 
-Cada comercio configura su tienda una vez. A partir de ahí un bot de IA atiende
-a sus clientes 24/7: muestra el menú, arma el pedido, cobra, verifica el
-comprobante de pago y lo manda a la cocina en tiempo real.
+Each merchant sets up their store once. From then on an AI bot serves their
+customers 24/7: shows the menu, builds the order, takes payment, verifies the
+transfer receipt and drops it in the kitchen in real time.
 
 ![Django](https://img.shields.io/badge/Django-5.x-092E20?style=flat-square&logo=django)
 ![DRF](https://img.shields.io/badge/DRF-REST_API-A30000?style=flat-square)
@@ -13,89 +14,90 @@ comprobante de pago y lo manda a la cocina en tiempo real.
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)
 ![Tailwind](https://img.shields.io/badge/Tailwind-3.4-06B6D4?style=flat-square&logo=tailwindcss)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker)
-![Licencia](https://img.shields.io/badge/Licencia-Solo%20consulta-red?style=flat-square)
+![License](https://img.shields.io/badge/License-View_only-red?style=flat-square)
 
 ---
 
-> ### ⚠️ Sobre este repositorio
+> ### ⚠️ About this repository
 >
-> Es un **snapshot curado con fines de portafolio**, congelado y sin
-> actualizaciones futuras. Se omitieron deliberadamente:
+> A **curated portfolio snapshot**, frozen and unmaintained. Deliberately left
+> out:
 >
-> - los **prompts de producción** del motor conversacional y del extractor de menús,
-> - la **lógica de orquestación afinada** del bot,
-> - los **precios y cupos reales** de los planes,
-> - todas las **credenciales**, dominios y datos de clientes.
+> - the **production prompts** of the conversational engine and the menu extractor,
+> - the **tuned orchestration logic** of the bot,
+> - the **real pricing and quotas** of the plans,
+> - all **credentials**, domains and customer data.
 >
-> Lo que queda es la arquitectura: el diseño del sistema, los modelos, la capa
-> de tiempo real, la seguridad multi-tenant, los tests y el pipeline de
-> despliegue. **El código no es desplegable.** Ver [LICENSE](LICENSE).
+> What remains is the architecture: the system design, the models, the real-time
+> layer, multi-tenant security, the tests and the deployment pipeline.
+> **The code is not deployable.** See [LICENSE](LICENSE).
 
 ---
 
-## El problema
+## The problem
 
-En LatAm, una porción enorme de los restaurantes vende por WhatsApp **a mano**.
-Alguien del equipo lee cada mensaje, transcribe el pedido a un papel, dicta el
-número de Nequi, espera la foto del comprobante, la verifica a ojo y le grita a
-la cocina lo que hay que preparar.
+In Latin America, a huge share of restaurants sell over WhatsApp **by hand**.
+Someone on the team reads every message, copies the order onto paper, dictates
+the bank transfer number, waits for a photo of the receipt, eyeballs it, and
+shouts into the kitchen what needs cooking.
 
-Funciona con cinco pedidos al día. Se cae en hora pico, que es exactamente
-cuando más plata hay sobre la mesa. Los síntomas son siempre los mismos:
+It works at five orders a day. It collapses at peak hour — which is exactly when
+the most money is on the table. The symptoms are always the same:
 
-- mensajes sin responder mientras la cocina está llena,
-- pedidos mal transcritos que se devuelven,
-- precios dictados de memoria, casi siempre desactualizados,
-- clientes que dejaron de pedir y de los que nadie se enteró.
+- messages left unanswered while the kitchen is full,
+- mis-transcribed orders that come back,
+- prices dictated from memory, almost always out of date,
+- customers who stopped ordering and nobody noticed.
 
-Las alternativas del mercado obligan al comensal a descargar una app o a entrar
-a un portal. En la práctica el comensal no quiere una app: quiere escribir por
-WhatsApp, como le escribe a cualquier persona.
+The alternatives on the market force the diner to download an app or open a
+portal. In practice the diner doesn't want an app: they want to type on WhatsApp,
+the way they text anyone else.
 
-## La solución
+## The solution
 
-| Para el cliente final | Para el dueño del negocio |
+| For the end customer | For the business owner |
 |---|---|
-| Escribe al WhatsApp del negocio como a cualquier contacto | Dashboard en tiempo real por WebSocket: Kanban de pedidos, chat y estadísticas |
-| El bot conoce el menú real y los precios exactos, y arma el pedido | Pantalla de cocina (KDS) con semáforo de tiempos, pantalla completa y wake-lock |
-| Paga por transferencia (foto del comprobante) o por link de pago | Sube su menú **con una foto** — la IA con visión lo estructura y lo carga |
-| Recibe confirmación, estado del pedido y seguimiento | Menú digital renderizado como imagen desde la BD: precios jamás alucinados |
-| El bot recuerda su nombre y su dirección entre pedidos | Bot entrenable: personalidad, horarios, domicilios y reglas propias |
+| Texts the business's WhatsApp like any other contact | Real-time dashboard over WebSocket: order Kanban, chat and stats |
+| The bot knows the real menu and exact prices, and builds the order | Kitchen display (KDS) with a timing traffic light, fullscreen and wake-lock |
+| Pays by transfer (photo of the receipt) or by payment link | Uploads the menu **from a photo** — vision AI structures and loads it |
+| Gets confirmation, order status and tracking | Digital menu rendered as an image from the database: prices never hallucinated |
+| The bot remembers their name and address between orders | Trainable bot: personality, hours, delivery rules of their own |
 
-**Multi-tienda real.** Cada comercio conecta *su* número de WhatsApp mediante
-Embedded Signup de Meta. Credenciales cifradas por tienda, aislamiento de datos
-por propietario a nivel de queryset y de constraint de BD.
+**Real multi-store.** Each merchant connects *their own* WhatsApp number through
+Meta's Embedded Signup. Per-store encrypted credentials, data isolation by owner
+at both the queryset and the database-constraint level.
 
-**Monetización integrada.** Planes por conversaciones mensuales (ventana de 24h,
-igual que la facturación de Meta), trial automático y enforcement *fail-open*.
+**Built-in monetization.** Plans by monthly conversations (24-hour window, same
+as Meta's billing), automatic trial and *fail-open* enforcement.
 
 ---
 
-## Capturas
+## Screenshots
 
-### Dashboard en tiempo real
+### Real-time dashboard
 
-Pedidos entrantes en una sola bandeja, con métricas del día y ranking de
-productos. El estado se actualiza por WebSocket: sin recargar, sin polling.
+Incoming orders in a single inbox, with the day's metrics and a product ranking.
+State updates over WebSocket: no reloads, no polling.
 
-![Dashboard de pedidos](docs/screenshots/dashboard.png)
+![Order dashboard](docs/screenshots/dashboard.png)
 
-### El bot vendiendo
+### The bot selling
 
-El bot reconoce al cliente recurrente, le propone su pedido anterior y sugiere
-el complemento. Los precios salen del catálogo, no del modelo.
+The bot recognizes a returning customer, offers their previous order and suggests
+the add-on. Prices come from the catalog, not from the model.
 
 <p align="center">
-  <img src="docs/screenshots/chat-bot.png" alt="Conversación con el bot" width="380">
+  <img src="docs/screenshots/chat-bot.png" alt="Conversation with the bot" width="380">
 </p>
 
-### Configuración del menú
+### Menu setup
 
-El comercio sube una foto o un PDF de su carta física y la IA con visión
-detecta categorías, productos y precios. Antes de crear nada, el dueño revisa
-y corrige en un preview — la extracción nunca escribe directo al catálogo.
+The merchant uploads a photo or a PDF of their physical menu and vision AI
+detects categories, products and prices. Before anything is created, the owner
+reviews and corrects it in a preview — extraction never writes straight to the
+catalog.
 
-![Configuración del menú](docs/screenshots/configuracion-menu.png)
+![Menu setup](docs/screenshots/configuracion-menu.png)
 
 ### Landing
 
@@ -103,37 +105,37 @@ y corrige en un preview — la extracción nunca escribe directo al catálogo.
 
 ---
 
-## Arquitectura
+## Architecture
 
 ```mermaid
 flowchart TB
-    subgraph canales["Canales de mensajería"]
+    subgraph canales["Messaging channels"]
         WA["WhatsApp Cloud API"]
     end
 
     subgraph backend["Backend — Django"]
-        WH["Webhooks<br/>verificación de firma"]
-        ENGINE["bot_engine<br/>motor conversacional"]
-        TASKS["Celery<br/>tareas asíncronas"]
+        WH["Webhooks<br/>signature verification"]
+        ENGINE["bot_engine<br/>conversational engine"]
+        TASKS["Celery<br/>async tasks"]
         WS["Channels / Daphne<br/>WebSocket"]
-        BILL["billing<br/>planes y cuotas"]
+        BILL["billing<br/>plans and quotas"]
     end
 
-    subgraph datos["Persistencia"]
+    subgraph datos["Persistence"]
         PG[("PostgreSQL")]
         RD[("Redis<br/>broker · cache · layer")]
     end
 
-    subgraph ia["Proveedores de IA"]
-        LLM["LLM de texto<br/>function calling"]
-        VIS["Modelo de visión<br/>extracción de menús"]
+    subgraph ia["AI providers"]
+        LLM["Text LLM<br/>function calling"]
+        VIS["Vision model<br/>menu extraction"]
     end
 
     subgraph front["Frontend — React SPA"]
         DASH["Dashboard · Kanban"]
-        KDS["Pantalla de cocina"]
-        CFG["Configuración de tienda"]
-        STAFF["Panel interno"]
+        KDS["Kitchen display"]
+        CFG["Store settings"]
+        STAFF["Internal panel"]
     end
 
     WA --> WH
@@ -152,87 +154,86 @@ flowchart TB
     RD <--> WS
 ```
 
-Detalle completo en [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+Full detail in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ---
 
-## Stack técnico
+## Stack
 
-| Capa | Tecnología |
+| Layer | Technology |
 |---|---|
 | **Backend** | Django · Django REST Framework · SimpleJWT |
-| **Tiempo real** | Django Channels · Daphne (ASGI) · Redis channel layer |
-| **Asincronía** | Celery (worker + beat) sobre Redis |
-| **Base de datos** | PostgreSQL en producción · SQLite en desarrollo |
-| **IA** | Gateway compatible con OpenAI · function calling · modelo con visión para menús |
+| **Real time** | Django Channels · Daphne (ASGI) · Redis channel layer |
+| **Async** | Celery (worker + beat) over Redis |
+| **Database** | PostgreSQL in production · SQLite in development |
+| **AI** | OpenAI-compatible gateway · function calling · vision model for menus |
 | **Frontend** | React 19 · React Router 7 · TailwindCSS · Framer Motion · GSAP · lucide-react |
-| **Mensajería** | WhatsApp Business Cloud API (Embedded Signup de Meta) |
-| **Infraestructura** | Docker · docker-compose · nginx · GitHub Actions |
-| **Observabilidad** | Sentry (opcional, se activa por variable de entorno) |
+| **Messaging** | WhatsApp Business Cloud API (Meta Embedded Signup) |
+| **Infrastructure** | Docker · docker-compose · nginx · GitHub Actions |
+| **Observability** | Sentry (optional, enabled by environment variable) |
 | **Testing** | pytest · pytest-django · 13 suites |
 
 ---
 
-## Decisiones de arquitectura
+## Architecture decisions
 
-Esta es la sección que explica *por qué* el sistema está construido así.
+This is the section that explains *why* the system is built this way.
 
-### 1. Los precios nunca los escribe el LLM
+### 1. The LLM never writes prices
 
-Un modelo de lenguaje que dicta precios de memoria se equivoca, y en venta real
-esa equivocación es plata perdida del comercio. La solución no fue afinar el
-prompt hasta que dejara de fallar — fue quitarle la posibilidad.
+A language model that dictates prices from memory gets them wrong, and in real
+sales that mistake is money out of the merchant's pocket. The fix wasn't tuning
+the prompt until it stopped failing — it was removing the possibility.
 
-Cuando el comercio tiene menú cargado, el bot **no transcribe la carta**: llama
-a la tool `enviar_menu` y el sistema envía una imagen renderizada con PIL
-directamente desde el modelo relacional. El LLM decide *cuándo* mostrar el
-menú; nunca decide *qué dice*.
+When the merchant has a menu loaded, the bot **doesn't transcribe the carte**: it
+calls the `enviar_menu` tool and the system sends an image rendered with PIL
+straight from the relational model. The LLM decides *when* to show the menu; it
+never decides *what it says*.
 
 📁 `orders/services/menu_image.py` · `orders/bot_engine.py::_send_menu_image`
 
-### 2. Red de seguridad anti-fraude sobre la salida del modelo
+### 2. An anti-fraud safety net over the model's output
 
-El prompt le prohíbe al bot dictar datos bancarios. Pero una prohibición en el
-prompt es una petición, no una garantía: basta un jailbreak o una alucinación
-para que el modelo escriba un número de cuenta que no existe — y el cliente
-transfiera su dinero a la nada.
+The prompt forbids the bot from dictating banking details. But a prohibition in a
+prompt is a request, not a guarantee: one jailbreak or one hallucination is
+enough for the model to write an account number that doesn't exist — and for the
+customer to transfer their money into the void.
 
-Por eso toda respuesta del bot pasa por un filtro que extrae los números que
-parecen datos de pago y los coteja contra una allowlist derivada de la
-configuración del comercio. Si aparece uno que no está autorizado, el mensaje
-se redacta, se sustituye por los datos reales y se registra el incidente.
+So every bot response passes through a filter that extracts numbers that look
+like payment details and checks them against an allowlist derived from the
+merchant's configuration. If an unauthorized one appears, the message is
+redacted, replaced with the real details, and the incident is logged.
 
-Defensa en profundidad: el prompt reduce la probabilidad, el filtro elimina la
-consecuencia.
+Defense in depth: the prompt reduces the probability, the filter removes the
+consequence.
 
 📁 `orders/bot_engine.py::_redact_payment_leak`
 
-### 3. Aislamiento multi-tenant, y qué lo garantiza realmente
+### 3. Multi-tenant isolation, and what actually guarantees it
 
-Un bug de autorización en un SaaS multi-tenant significa que un restaurante ve
-los pedidos de otro. No es un bug de UX: es una fuga de datos entre clientes
-que compiten entre sí.
+An authorization bug in a multi-tenant SaaS means one restaurant sees another
+one's orders. That isn't a UX bug: it's a data leak between customers who compete
+with each other.
 
-El aislamiento se aplica **en la capa de aplicación**, filtrando desde la
-relación hacia el dueño autenticado, con el mismo patrón en todos los
-querysets:
+Isolation is enforced **at the application layer**, filtering from the relation
+toward the authenticated owner, with the same pattern across every queryset:
 
 ```python
 Product.objects.filter(category__store__owner=self.request.user)
 Order.objects.filter(store__owner=self.request.user)
 ```
 
-Las escrituras además verifican la propiedad de forma explícita: un `POST` que
-referencia un `store_id` ajeno no lo cubre el queryset de lectura.
+Writes additionally verify ownership explicitly: a `POST` referencing someone
+else's `store_id` isn't covered by the read queryset.
 
-La base de datos aporta una capa **distinta**, no redundante: la unicidad está
-alcanzada por tienda (`unique_together = ['store', 'name']`,
-`['store', 'channel_id', 'channel_type']`). Eso resuelve una pregunta de
-modelado, no de autorización: el mismo número de WhatsApp que pide en dos
-restaurantes son **dos clientes distintos**, con historiales que jamás se
-cruzan. Un comercio no puede ver qué pidió su cliente en otro lado.
+The database contributes a **different** layer, not a redundant one: uniqueness
+is scoped per store (`unique_together = ['store', 'name']`,
+`['store', 'channel_id', 'channel_type']`). That answers a modeling question, not
+an authorization one: the same WhatsApp number ordering from two restaurants is
+**two distinct customers**, with histories that never cross. A merchant cannot
+see what their customer ordered elsewhere.
 
-Y una constraint parcial que cubre otro problema — la idempotencia de webhooks:
+And a partial constraint covering a different problem — webhook idempotency:
 
 ```python
 models.UniqueConstraint(
@@ -242,82 +243,79 @@ models.UniqueConstraint(
 )
 ```
 
-Meta reintenta cualquier webhook que no conteste rápido. El duplicado falla en
-el motor de la base de datos, no en un `if` que se puede olvidar.
+Meta retries any webhook that doesn't answer fast. The duplicate fails in the
+database engine, not in an `if` somebody can forget.
 
-**Límite conocido:** la garantía de aislamiento vive en la aplicación. Es
-consistente y está cubierta por tests, pero no es estructural — un endpoint
-futuro que olvide filtrar abriría un hueco. Mover esa garantía al motor (RLS de
-Postgres, o un manager por defecto que fuerce el filtro) es el siguiente paso
-natural si el equipo creciera.
+**Known limit:** the isolation guarantee lives in the application. It's
+consistent and covered by tests, but it isn't structural — a future endpoint that
+forgets to filter would open a hole. Moving that guarantee into the engine
+(Postgres RLS, or a default manager that forces the filter) is the natural next
+step if the team grew.
 
 📁 `orders/views.py` · `orders/models.py` · `orders/staff_permissions.py`
 
-### 4. Enforcement de facturación *fail-open*
+### 4. *Fail-open* billing enforcement
 
-La cuota de conversaciones se verifica en cada mensaje entrante. Pero si esa
-verificación lanza una excepción — Redis caído, una migración a medias, un bug
-en el cálculo del período — la decisión correcta **no** es bloquear la venta.
+The conversation quota is checked on every inbound message. But if that check
+throws — Redis down, a half-applied migration, a bug in the period calculation —
+the correct decision is **not** to block the sale.
 
-Un error de facturación jamás debe costarle un pedido a un comercio. El
-enforcement falla hacia abierto: registra, alerta y deja pasar. Se pierde una
-conversación facturable; no se pierde la venta de un cliente que no tiene la
-culpa de tu bug.
+A billing error must never cost a merchant an order. Enforcement fails open: it
+logs, alerts, and lets the message through. You lose one billable conversation;
+you don't lose the sale of a customer who isn't at fault for your bug.
 
 📁 `orders/billing.py`
 
-### 5. Prompt compuesto por capas
+### 5. A prompt composed in layers
 
-El system prompt no es una constante: se construye en cada turno concatenando
-capas con precedencia creciente — identidad, contexto del negocio, contexto del
-cliente, pedido en curso, menú actual, reglas de venta, reglas anti-invención,
-reglas de pago, personalidad y, de último, las instrucciones propias del
-comercio.
+The system prompt isn't a constant: it's assembled on every turn by concatenating
+layers of increasing precedence — identity, business context, customer context,
+in-flight order, current menu, sales rules, anti-invention rules, payment rules,
+personality, and last of all the merchant's own instructions.
 
-El orden importa: lo que va al final pesa más en la atención del modelo, y por
-eso las reglas del dueño se inyectan al cierre. El menú se re-inyecta en cada
-turno sin cachear: si el comercio cambia un precio, el bot lo refleja en el
-mensaje siguiente.
+Order matters: what goes last weighs more in the model's attention, which is why
+the owner's rules are injected at the close. The menu is re-injected every turn
+without caching: if the merchant changes a price, the bot reflects it in the next
+message.
 
-📁 `orders/prompts.py` — la arquitectura está documentada; el contenido no.
+📁 `orders/prompts.py` — the architecture is documented; the content is not.
 
-### 6. El motor no sabe por dónde llegó el mensaje
+### 6. The engine doesn't know how the message arrived
 
-`bot_engine` recibe texto y devuelve texto. No conoce el transporte: quién
-entregó el mensaje y cómo se responde vive en una capa de adaptadores de canal
-detrás de una interfaz común, y el `source` del pedido decide cuál se usa al
-salir.
+`bot_engine` takes text and returns text. It knows nothing about transport: who
+delivered the message and how to reply lives in a layer of channel adapters
+behind a common interface, and the order's `source` decides which one is used on
+the way out.
 
-Esto no salió de una previsión de producto — salió de una necesidad de
-desarrollo. Aprobar un número de WhatsApp Business con Meta toma semanas, y
-esperar sentado a esa aprobación habría congelado el desarrollo del motor
-conversacional, que es la parte difícil. Con un segundo adaptador de canal
-—trivial de implementar contra la misma interfaz— fue posible iterar el bot
-contra conversaciones reales desde el primer día.
+This didn't come from product foresight — it came from a development need.
+Getting a WhatsApp Business number approved by Meta takes weeks, and sitting on
+our hands waiting would have frozen work on the conversational engine, which is
+the hard part. With a second channel adapter — trivial to implement against the
+same interface — it was possible to iterate the bot against real conversations
+from day one.
 
-El beneficio arquitectónico llegó después: probar el motor sin depender de un
-proveedor externo, y quedar con la puerta abierta a canales nuevos sin tocar
-el núcleo. **En producción el canal es WhatsApp**; el resto es andamiaje de
-desarrollo que se quedó porque desacopla.
+The architectural benefit arrived afterwards: testing the engine without
+depending on an external provider, and leaving the door open to new channels
+without touching the core. **In production the channel is WhatsApp**; the rest is
+development scaffolding that stayed because it decouples.
 
-📁 `orders/services/` · `orders/tasks.py` · `Order.source` en `orders/models.py`
+📁 `orders/services/` · `orders/tasks.py` · `Order.source` in `orders/models.py`
 
-### 7. Credenciales por tienda, no una cuenta central
+### 7. Per-store credentials, not one central account
 
-Cada comercio conecta su propio número vía Embedded Signup de Meta. Sus
-credenciales se guardan cifradas y asociadas a su tienda, nunca en una cuenta
-compartida de la plataforma. Un comercio que se va se lleva su número; una
-credencial comprometida no expone a los demás.
+Each merchant connects their own number via Meta's Embedded Signup. Their
+credentials are stored encrypted and tied to their store, never in a shared
+platform account. A merchant who leaves takes their number with them; one
+compromised credential doesn't expose the others.
 
-📁 `orders/services/whatsapp_service.py` · migraciones `0005`, `0018`
+📁 `orders/services/whatsapp_service.py` · migrations `0005`, `0018`
 
-### 8. Panel interno con impersonation auditada
+### 8. Internal panel with audited impersonation
 
-El equipo de soporte necesita ver lo que ve el comercio para poder ayudarlo.
-Eso es, literalmente, un backdoor — así que se construyó como tal, a la vista:
-login separado del embudo de comercios, MFA por correo obligatorio,
-restricción por dominio de correo, banner permanente durante la suplantación y
-registro en bitácora de cada acción.
+The support team needs to see what the merchant sees in order to help them. That
+is, literally, a backdoor — so it was built as one, in plain sight: login
+separate from the merchant funnel, mandatory email MFA, email-domain restriction,
+a permanent banner during impersonation, and an audit log entry for every action.
 
 📁 `orders/staff_views.py` · `orders/services/staff_mfa.py` · `frontend/src/staff/`
 
@@ -325,26 +323,26 @@ registro en bitácora de cada acción.
 
 ## Testing
 
-13 suites con pytest cubriendo el núcleo del sistema:
+13 pytest suites covering the core of the system:
 
-| Suite | Qué protege |
+| Suite | What it protects |
 |---|---|
-| `test_bot_pure.py` | Lógica del motor conversacional aislada del LLM |
-| `test_bot_pause.py` | Pausa del bot y toma de control manual de la conversación |
-| `test_billing.py` | Ciclo de vida de suscripción, trial, degradación, cuotas |
-| `test_whatsapp_webhook.py` | Verificación de firma e idempotencia del webhook |
-| `test_whatsapp_service.py` | Envío de mensajes y manejo de errores de la API |
-| `test_whatsapp_onboarding.py` | Flujo de Embedded Signup |
-| `test_staff_login.py` | Login del panel interno, MFA, respuestas indistinguibles |
-| `test_staffaccount_command.py` | Comando de creación de cuentas de equipo |
-| `test_account_flows.py` | Registro, reset de contraseña, cambio de correo |
-| `test_data_deletion.py` | Borrado de datos (cumplimiento Meta / habeas data) |
-| `test_reports.py` | Reportes de ventas y exportación |
-| `test_emails.py` | Renderizado de las plantillas transaccionales |
-| `test_api.py` | Contratos de la API REST |
+| `test_bot_pure.py` | Conversational engine logic, isolated from the LLM |
+| `test_bot_pause.py` | Pausing the bot and taking over the conversation manually |
+| `test_billing.py` | Subscription lifecycle, trial, downgrade, quotas |
+| `test_whatsapp_webhook.py` | Webhook signature verification and idempotency |
+| `test_whatsapp_service.py` | Message sending and API error handling |
+| `test_whatsapp_onboarding.py` | Embedded Signup flow |
+| `test_staff_login.py` | Internal panel login, MFA, indistinguishable responses |
+| `test_staffaccount_command.py` | Team account creation command |
+| `test_account_flows.py` | Signup, password reset, email change |
+| `test_data_deletion.py` | Data deletion (Meta compliance / habeas data) |
+| `test_reports.py` | Sales reports and export |
+| `test_emails.py` | Rendering of the transactional templates |
+| `test_api.py` | REST API contracts |
 
-El CI además corre un **migration drift guard**: falla si los modelos y las
-migraciones se desincronizan, que es el error que solo aparece en producción.
+CI also runs a **migration drift guard**: it fails if models and migrations fall
+out of sync, which is the error that otherwise only shows up in production.
 
 ```bash
 pytest
@@ -352,24 +350,25 @@ pytest
 
 ---
 
-## Estado del proyecto
+## Project status
 
-En producción con comercios piloto en Bucaramanga, Colombia. El desarrollo
-activo continúa en un repositorio privado.
+In production with pilot merchants in Bucaramanga, Colombia. Active development
+continues in a private repository.
 
-**Este repositorio es un snapshot congelado** tomado para mostrar el trabajo.
-No recibe actualizaciones y no refleja el estado actual del producto.
-
----
-
-## Licencia
-
-Todos los derechos reservados. Se concede permiso únicamente para **leer y
-evaluar** el código con fines de revisión técnica. Cualquier uso, copia,
-modificación o redistribución requiere autorización previa y por escrito.
-
-Ver [LICENSE](LICENSE) para el texto completo.
+**This repository is a frozen snapshot** taken to show the work. It receives no
+updates and does not reflect the current state of the product.
 
 ---
 
-<sub>Construido por Luis Mellizo · Bogotá, Colombia</sub>
+## License
+
+All rights reserved. Permission is granted solely to **read and evaluate** the
+code for technical review. Any use, copying, modification or redistribution
+requires prior written authorization.
+
+See [LICENSE](LICENSE) for the full text.
+
+---
+
+<sub>Built by Luis Mellizo · Bogotá, Colombia</sub>
+<br><sub>Code comments and inline documentation are in Spanish — the product serves a Spanish-speaking market.</sub>
